@@ -19,10 +19,13 @@ public class FtpRequest extends Thread {
 	/** The socket which represents the connexion with the client */
 	private final Socket socket;
 
+	/** The username */
 	private String user;
-	private boolean authentificated;
+	
+	/** <code>true</code> if the user is authenticated, <code>false</code> else. */
+	private boolean authenticated;
 
-	private PrintWriter out;
+	private final PrintWriter out;
 
 	/** List of possible commands */
 	private static final List<String> LIST_CMDS = Arrays.asList(
@@ -42,8 +45,9 @@ public class FtpRequest extends Thread {
 		this.socket = socket;
 		this.folderPath = folderPath;
 		this.request = request;
-		authentificated = false;
-		out = new PrintWriter(socket.getOutputStream(), true);
+		this.authenticated = false;
+		out = new PrintWriter(socket.getOutputStream(), 
+	            true);
 	}
 
 	/**
