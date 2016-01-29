@@ -18,19 +18,20 @@ public class Serveur extends ServerSocket{
 	// 430 identification ou mdp incorrect
 	// 500 erreur de syntaxe. commande non reconnue et action non effectée
 	// 501 erreur de syntaxe dans les paramètres ou les arguments
+
+	public static final Map<String, String> users = new HashMap<String, String>();
 	
-	 public static final Map<String, String> users = new HashMap<String, String>();
-	 public String folderPath;
-	 /**
+	public String folderPath;
+	/**
 	 * Constructor for the class to represent a server
 	 * for the FTP Client Server interaction
 	 */
 	public Serveur(int port, String folderPath) throws IOException {
 		super(port);
 		this.folderPath = folderPath;
-		
+
 	}
-	
+
 	public static void addUser(String user, String password){
 		Serveur.users.put(user, password);
 	}
@@ -43,25 +44,30 @@ public class Serveur extends ServerSocket{
 		while(true){
 			System.out.println("Waiting for connexion with a client");
 			Socket socket = accept();
-			
+
 			System.out.println("Connexion etablished");
-			
+
 			socket.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
-			//FtpRequest ftpRequest = new FtpRequest(folderPath, in.readLine());
-		    //ftpRequest.start();
-			
+
+			//FtpRequest ftpRequest = new FtpRequest(socket, folderPath, in.readLine());
+			//ftpRequest.start();
+
 		}
 	}
-		
-	
-	public static void main(String [] args) throws IOException{
-		Serveur.addUser("azerty", "azerty");
-		Serveur s = new Serveur(2048, "");
-		s.run();
-		
-		s.close();
+
+
+	public static void main(String [] args){
+		try {
+			Serveur.addUser("azerty", "azerty");
+			Serveur s = new Serveur(2048, "");
+			s.run();
+
+			s.close();
+		} catch(Exception e){
+			e.printStackTrace();
+			System.exit(0);
+		}
 	}
 
 

@@ -1,5 +1,8 @@
 package tp1.src;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,6 +10,18 @@ public class FtpRequest extends Thread {
 	
 	/** The request to process. */
 	private final String request;
+	
+	/** The folder path of the server */
+	private final String folderPath;
+	
+	/** The socket which represents the connexion with the client */
+	private final Socket socket;
+	
+	
+	private String user;
+	private boolean authentificated;
+	
+	private PrintWriter out;
 	
 	/** List of possible commands */
 	private static final List<String> LIST_CMDS = Arrays.asList(
@@ -22,10 +37,16 @@ public class FtpRequest extends Thread {
 	 * Constructor with parameter.
 	 * 
 	 * @param request The request to process.
+	 * @throws IOException 
 	 */
-	public FtpRequest(final String request) {
+	public FtpRequest(Socket socket, final String folderPath, final String request) throws IOException {
 		super();
+		this.socket = socket;
+		this.folderPath = folderPath;
 		this.request = request;
+		authentificated = false;
+		out = new PrintWriter(socket.getOutputStream(), 
+	            true);
 	}
 	
 	/**
@@ -33,7 +54,11 @@ public class FtpRequest extends Thread {
 	 */
 	@Override
 	public void run() {
-		processRequest(this.request);
+		try {
+			processRequest(this.request);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -41,8 +66,11 @@ public class FtpRequest extends Thread {
 	 * relevant method to treat it.
 	 * 
 	 * @param request The request received by the server.
+	 * @throws IOException 
 	 */
-	public void processRequest(final String request) {
+	public void processRequest(final String request) throws IOException {
+		
+		
 		int ind = request.indexOf(" ");
 		final String cmd = ind != -1
 						 ? request.substring(0, ind)
@@ -106,18 +134,32 @@ public class FtpRequest extends Thread {
 	 * Processes a USER type request, used to provide an user name to login.
 	 * 
 	 * @param user The provided user name.
+	 * @throws IOException 
 	 */
-	protected void processUSER(final String user) {
-		// TODO: implement
+	protected void processUSER(final String user) throws IOException {
+		PrintWriter out = new PrintWriter(socket.getOutputStream(), 
+                true);
+		if(Serveur.users.containsKey(user)){
+			this.user = user;
+			out.print("331 user reconnu");
+		} else {
+			out.print("430 identifiant incorrect");
+		}
+			
 	}
 	
 	/**
 	 * Processes a PASS type request, used to provide a password to login.
 	 * 
 	 * @param pass The provided password.
+	 * @throws IOException 
 	 */
-	protected void processPASS(final String pass) {
-		// TODO: implement
+	protected void processPASS(final String pass) throws IOException {
+		if(this.user != null && Serveur.users.get(user).equals(pass)){
+			out.print(Constants.CODE_AUTH_SUCC + " authentification réussie");
+		} else {
+			out.print("430 mot de passe");
+		}
 	}
 	
 	/**
