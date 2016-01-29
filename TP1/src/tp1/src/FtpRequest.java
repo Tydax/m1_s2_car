@@ -132,6 +132,11 @@ public class FtpRequest extends Thread {
 		
 		}
 		
+		out.print(Constants.CODE_DISCONNECTION + " Good bye !");
+		out.flush();
+		
+		socket.close();
+		
 	}
 
 	/**
