@@ -8,15 +8,24 @@ import java.util.Map;
 
 
 public class Serveur extends ServerSocket{
+	// 220 dès qu'un client a demandé et réussi une co (donc avant même l'authentification)
+	// 226 transfert réalisé avec succès
+	// 221 deconnexion
+	// 230 authentification réussi
+	// 331 user reconnnu. en attente de mot de passe
+	// 430 identification ou mdp incorrect
+	// 500 erreur de syntaxe. commande non reconnue et action non effectée
+	// 501 erreur de syntaxe dans les paramètres ou les arguments
 	
 	 public static final Map<String, String> users = new HashMap<String, String>();
-	
+	 public String folderPath;
 	 /**
 	 * Constructor for the class to represent a server
 	 * for the FTP Client Server interaction
 	 */
 	public Serveur(int port, String folderPath) throws IOException {
 		super(port);
+		this.folderPath = folderPath;
 		
 	}
 	
@@ -38,8 +47,9 @@ public class Serveur extends ServerSocket{
 			socket.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
-			//FtpRequest ftpRequest = new FtpRequest(in.readLine());
+			//FtpRequest ftpRequest = new FtpRequest(folderPath, in.readLine());
 		    //ftpRequest.start();
+			
 		}
 	}
 		
@@ -48,6 +58,8 @@ public class Serveur extends ServerSocket{
 		Serveur.addUser("azerty", "azerty");
 		Serveur s = new Serveur(2048, "");
 		s.run();
+		
+		s.close();
 	}
 
 
