@@ -84,38 +84,62 @@ public class FtpRequest extends Thread {
 			// Unrecognised command
 			processUnrecognisedCmd(cmd);
 		} else {
-			// Checks if a parameter is needed
+			// Check if a parameter is needed
 			if (isParametrable(cmd)) {
-				final String param = request.substring(ind + 1);
+				// Check if a parameter is provided
+				if (ind == -1) {
+					// No parameter, return error
+					processNoParamCmd(cmd);
+				} else {
+					final String param = request.substring(ind + 1);
 				
-				switch (cmd) {
-					case Constants.CMD_USER:
-						processUSER(param);
-						break;
+					switch (cmd) {
+						case Constants.CMD_USER:
+							processUSER(param);
+							break;
+							
+						case Constants.CMD_PASS:
+							processPASS(param);
+							break;
 						
-					case Constants.CMD_PASS:
-						processPASS(param);
+						case Constants.CMD_STOR:
+							processSTOR(param);
+							break;
+						
+						case Constants.CMD_RETR:
+							processRETR(param);
+							break;
+					}
+				}
+			} else {
+				// No parameter is needed
+				switch (cmd) {
+					case Constants.CMD_LIST:
+						processLIST();
 						break;
 					
-					case Constants.CMD_STOR:
-						processSTOR(param);
-						break;
-					
-					case Constants.CMD_RETR:
-						processRETR(param);
+					case Constants.CMD_QUIT:
+						processQUIT();
 						break;
 				}
 			}
 		}
 	}
 	
+	/**
+	 * Checks if a command needs a parameter or not.
+	 * 
+	 * @param cmd The command to check.
+	 * @return <code>true</code> if the command needs a parameter; <br>
+	 * 		   <code>false</code> else.
+	 */
 	protected static boolean isParametrable(final String cmd) {
 		// TODO: implement
 		return false;
 	}
 	
 	/**
-	 * Processes when an invalid request was provided.
+	 * Treats case where an invalid request was provided.
 	 */
 	protected void processNoCmd() {
 		// TODO: implement
@@ -127,6 +151,15 @@ public class FtpRequest extends Thread {
 	 * @param cmd The unrecognised request.
 	 */
 	protected void processUnrecognisedCmd(final String cmd) {
+		// TODO: implement
+	}
+	
+	/**
+	 * Processes a command that needs a parameter but was not provided one
+	 * 
+	 * @param cmd The command
+	 */
+	protected void processNoParamCmd(final String cmd) {
 		// TODO: implement
 	}
 	
