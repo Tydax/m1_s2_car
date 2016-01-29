@@ -3,6 +3,7 @@ package tp1.src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -45,13 +46,17 @@ public class Serveur extends ServerSocket{
 			System.out.println("Waiting for connexion with a client");
 			Socket socket = accept();
 
+			PrintWriter out = new PrintWriter(socket.getOutputStream(), 
+		            true);
+			out.print(Constants.CODE_CONNECTION_SUCC + " OK\n");
+			out.flush();
 			System.out.println("Connexion etablished");
 
 			socket.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-			//FtpRequest ftpRequest = new FtpRequest(socket, folderPath, in.readLine());
-			//ftpRequest.start();
+			
+			FtpRequest ftpRequest = new FtpRequest(socket, folderPath, in.readLine());
+			ftpRequest.start();
 
 		}
 	}
