@@ -19,4 +19,12 @@ public class Constants {
 	public static final int CODE_AUTH_FAILED = 430;
 	public static final int CODE_INVALID_CMD = 500;
 	public static final int CODE_INVALID_PARAM = 501;
+
+	// Messages
+    public static final String MSG_CONNECTION_SUCC = "%d Successfully connected to server\n";
+	public static final String MSG_QUIT = "%d Goodbye!\n";
+	public static final String MSG_WAITING_PASS = "%d Waiting for user password...\n";
+	public static final String MSG_AUTH_FAILED = "%d Authentication failed\n";
+    public static final String MSG_AUTH_NOLOGIN = "%d No username provided\n";
+	public static final String MSG_AUTH_SUCC = "%d Authentication successful\n";
 }

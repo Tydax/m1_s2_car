@@ -11,16 +11,8 @@ import java.util.Map;
 
 
 public class Serveur extends ServerSocket{
-	// 220 dès qu'un client a demandé et réussi une co (donc avant même l'authentification)
-	// 226 transfert réalisé avec succès
-	// 221 deconnexion
-	// 230 authentification réussi
-	// 331 user reconnnu. en attente de mot de passe
-	// 430 identification ou mdp incorrect
-	// 500 erreur de syntaxe. commande non reconnue et action non effectée
-	// 501 erreur de syntaxe dans les paramètres ou les arguments
 
-	public static final Map<String, String> users = new HashMap<String, String>();
+	public static final Map<String, String> users = new HashMap<>();
 	
 	public String folderPath;
 	/**
@@ -43,21 +35,22 @@ public class Serveur extends ServerSocket{
 	 */
 	public void run() throws IOException{
 		while(true){
-			System.out.println("Waiting for connexion with a client");
+			System.out.println("[Server] Waiting for connexion with a client...");
 			Socket socket = accept();
 
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), 
+			final PrintWriter out = new PrintWriter(socket.getOutputStream(),
 		            true);
-			out.print(Constants.CODE_CONNECTION_SUCC + " OK\n");
+            final String msg = String.format(Constants.MSG_CONNECTION_SUCC, Constants.CODE_CONNECTION_SUCC);
+			out.print(msg);
 			out.flush();
-			System.out.println("Connexion etablished");
+
+			System.out.println("[Server] Connection established");
 
 			socket.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
-			FtpRequest ftpRequest = new FtpRequest(socket, folderPath, in.readLine());
+			final FtpRequest ftpRequest = new FtpRequest(socket, folderPath);
 			ftpRequest.start();
-
 		}
 	}
 
@@ -69,7 +62,7 @@ public class Serveur extends ServerSocket{
 			s.run();
 
 			s.close();
-		} catch(Exception e){
+		} catch(final Exception e){
 			e.printStackTrace();
 			System.exit(0);
 		}

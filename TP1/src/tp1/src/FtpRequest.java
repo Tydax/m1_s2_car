@@ -1,57 +1,58 @@
 package tp1.src;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
 
 public class FtpRequest extends Thread {
 
-	/** The request to process. */
-	private String request;
+    /** The socket which represents the connexion with the client */
+    private final Socket socket;
+
+    /** The input reader associated with the socket. */
+    private final BufferedReader input;
+
+    /** The output writer associated wit hthe socket. */
+    private final PrintWriter output;
 
 	/** The folder path of the server */
-	private final String folderPath;
-
-	/** The socket which represents the connexion with the client */
-	private final Socket socket;
+	private final File workingDirectory;
 
 	/** The username */
-	private String user;
-	
-	/** <code>true</code> if the user is authenticated, <code>false</code> else. */
-	private boolean authenticated;
+	private String username;
 
-	private final PrintWriter out;
+	/** <code>true</code> if the username is authenticated, <code>false</code> else. */
+	private boolean authenticated;
 
 	/** List of possible commands */
 	private static final List<String> LIST_CMDS = Arrays.asList(
-			Constants.CMD_USER, Constants.CMD_PASS, Constants.CMD_RETR,
-			Constants.CMD_STOR, Constants.CMD_LIST, Constants.CMD_QUIT);
+			Constants.CMD_USER,
+            Constants.CMD_PASS,
+            Constants.CMD_RETR,
+			Constants.CMD_STOR,
+            Constants.CMD_LIST,
+            Constants.CMD_QUIT
+    );
 
-	/**
-	 * Constructor with parameter.
-	 * 
-	 * @param request
-	 *            The request to process.
-	 * @throws IOException
-	 */
-	public FtpRequest(Socket socket, final String folderPath,
-			final String request) throws IOException {
+    /**
+     * Creates a new FtpRequest handling a client by listening to the input received.
+     * @param socket The socket used to listen.
+     * @param workingDirectoryPath The path to working directory.
+     * @throws IOException
+     */
+	public FtpRequest(final Socket socket, final String workingDirectoryPath) throws IOException {
 		super();
 		this.socket = socket;
-		this.folderPath = folderPath;
-		this.request = request;
-		this.authenticated = false;
-		out = new PrintWriter(socket.getOutputStream(), 
-	            true);
+        this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        this.output = new PrintWriter(socket.getOutputStream(),
+                true);
+        this.workingDirectory = new File(workingDirectoryPath);
+        this.authenticated = false;
 	}
 
 	/**
-	 * Calls the {@link #processRequest(String)} method.
+	 * Calls the {@link #processRequest()} method.
 	 */
 	@Override
 	public void run() {
@@ -66,77 +67,71 @@ public class FtpRequest extends Thread {
 	 * Processes the received request by the server and calls the relevant
 	 * method to treat it.
 	 * 
-	 * @param request
-	 *            The request received by the server.
 	 * @throws IOException
 	 */
 	public void processRequest() throws IOException {
+        String request;
+        boolean keepOpen = true;
+        while (keepOpen) {
+            request = this.input.readLine();
+            System.out.println("Message normalement envoyé");
+            int ind = request.indexOf(" ");
+            final String cmd = ind != -1 ? request.substring(0, ind) : request;
 
-		while (!request.equals("QUIT")) {
-			System.out.println("Message normalement envoyé");
-			int ind = request.indexOf(" ");
-			final String cmd = ind != -1 ? request.substring(0, ind) : request;
+            if (cmd == null) {
+                // Invalid cmd
+                processNoCmd();
+            } else {
+                System.out.println(String.format("[Server] Command %s received", cmd));
+                if (!LIST_CMDS.contains(cmd)) {
+                    // Unrecognised command
+                    processUnrecognisedCmd(cmd);
+                } else {
+                    // Check if a parameter is needed
+                    if (isParametrable(cmd)) {
+                        // Check if a parameter is provided
+                        if (ind == -1) {
+                            // No parameter, return error
+                            processNoParamCmd(cmd);
+                        } else {
+                            final String param = request.substring(ind + 1);
+                            System.out.println("Commande : " + cmd);
+                            switch (cmd) {
+                                case Constants.CMD_USER:
+                                    processUSER(param);
+                                    break;
 
-			System.out.println("Commande first : " + cmd);
+                                case Constants.CMD_PASS:
+                                    processPASS(param);
+                                    break;
 
-			if (cmd == null) {
-				// Invalid cmd
-				processNoCmd();
-			} else if (!LIST_CMDS.contains(cmd)) {
-				// Unrecognised command
-				processUnrecognisedCmd(cmd);
-			} else {
-				// Check if a parameter is needed
-				if (isParametrable(cmd)) {
-					// Check if a parameter is provided
-					if (ind == -1) {
-						// No parameter, return error
-						processNoParamCmd(cmd);
-					} else {
-						final String param = request.substring(ind + 1);
-						System.out.println("Commande : " + cmd);
-						switch (cmd) {
-						case Constants.CMD_USER:
-							processUSER(param);
-							break;
+                                case Constants.CMD_STOR:
+                                    processSTOR(param);
+                                    break;
 
-						case Constants.CMD_PASS:
-							processPASS(param);
-							break;
+                                case Constants.CMD_RETR:
+                                    processRETR(param);
+                                    break;
+                            }
+                        }
+                    } else {
+                        // No parameter is needed
+                        switch (cmd) {
+                            case Constants.CMD_LIST:
+                                processLIST();
+                                break;
 
-						case Constants.CMD_STOR:
-							processSTOR(param);
-							break;
+                            case Constants.CMD_QUIT:
+                                processQUIT();
+                                keepOpen = false;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
 
-						case Constants.CMD_RETR:
-							processRETR(param);
-							break;
-						}
-					}
-				} else {
-					// No parameter is needed
-					switch (cmd) {
-					case Constants.CMD_LIST:
-						processLIST();
-						break;
-
-					case Constants.CMD_QUIT:
-						processQUIT();
-						break;
-					}
-				}
-			}
-			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
-			request = in.readLine();
-		
-		}
-		
-		out.print(Constants.CODE_DISCONNECTION + " Good bye !");
-		out.flush();
-		
 		socket.close();
-		
 	}
 
 	/**
@@ -151,6 +146,20 @@ public class FtpRequest extends Thread {
 		return cmd.equals("USER") || cmd.equals("PASS") || cmd.equals("RETR")
 				|| cmd.equals("STOR");
 	}
+
+    /**
+     * Base method to send a generated message with a code and a message.
+     * @param code The code to send.
+     * @param msg The String message to send (must contain a '%d ' to be formatted).
+     */
+    protected void processRequestBase(final int code, final String msg) {
+        final String finalMsg = String.format(msg, code);
+        this.output.print(finalMsg);
+        this.output.flush();
+
+        final String logMsg = String.format("[Server] Sent message '%s'", finalMsg);
+        logOutput(logMsg);
+    }
 
 	/**
 	 * Treats case where an invalid request was provided.
@@ -180,21 +189,25 @@ public class FtpRequest extends Thread {
 	}
 
 	/**
-	 * Processes a USER type request, used to provide an user name to login.
+	 * Processes a USER type request, used to provide an username to login.
 	 * 
 	 * @param user
-	 *            The provided user name.
+	 *            The provided username name.
 	 * @throws IOException
 	 */
 	protected void processUSER(final String user) throws IOException {
-		if (Serveur.users.containsKey(user)) {
-			this.user = user;
-			out.print("331 user reconnu\n");
-		} else {
-			out.print("430 identifiant incorrect\n");
-		}
-		out.flush();
+        final String msg;
 
+		if (Serveur.users.containsKey(user)) {
+			this.username = user;
+            msg = String.format(Constants.MSG_WAITING_PASS, Constants.CODE_WAITING_PASS);
+		} else {
+            msg = String.format(Constants.MSG_AUTH_FAILED, Constants.CODE_AUTH_FAILED);
+        }
+
+        this.output.print(msg);
+        this.output.flush();
+        logOutput(msg);
 	}
 
 	/**
@@ -205,12 +218,16 @@ public class FtpRequest extends Thread {
 	 * @throws IOException
 	 */
 	protected void processPASS(final String pass) throws IOException {
-		if (this.user != null && Serveur.users.get(user).equals(pass)) {
-			out.print(Constants.CODE_AUTH_SUCC + " authentification réussie\n");
-		} else {
-			out.print("430 mot de passe\n");
-		}
-		out.flush();
+        if (this.username != null) {
+            if (Serveur.users.get(username).equals(pass)) {
+                processRequestBase(Constants.CODE_AUTH_SUCC, Constants.MSG_AUTH_SUCC);
+            } else {
+                processRequestBase(Constants.CODE_AUTH_FAILED, Constants.MSG_AUTH_FAILED);
+            }
+        } else {
+            // Username not provided
+            processRequestBase(Constants.CODE_AUTH_FAILED, Constants.MSG_AUTH_NOLOGIN);
+        }
 	}
 
 	/**
@@ -238,13 +255,18 @@ public class FtpRequest extends Thread {
 	 * directory.
 	 */
 	protected void processLIST() {
-		// TODO: implement
+        // TODO: implement
 	}
 
 	/**
 	 * Processes a QUIT type request, used to quit from the server.
 	 */
 	protected void processQUIT() {
-		// TODO: implement
+        processRequestBase(Constants.CODE_DISCONNECTION, Constants.MSG_QUIT);
 	}
+
+    protected static void logOutput(final String msg) {
+        final String display = String.format("[Server] Sent message '%s'", msg);
+        System.out.println(display);
+    }
 }
