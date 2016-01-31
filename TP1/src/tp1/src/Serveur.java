@@ -15,6 +15,7 @@ public class Serveur extends ServerSocket{
 	public static final Map<String, String> users = new HashMap<>();
 	
 	public String folderPath;
+
 	/**
 	 * Constructor for the class to represent a server
 	 * for the FTP Client Server interaction
@@ -41,7 +42,7 @@ public class Serveur extends ServerSocket{
 			final PrintWriter out = new PrintWriter(socket.getOutputStream(),
 		            true);
             final String msg = String.format(Constants.MSG_CONNECTION_SUCC, Constants.CODE_CONNECTION_SUCC);
-			out.print(msg);
+			out.println(msg);
 			out.flush();
 
 			System.out.println("[Server] Connection established");
@@ -58,7 +59,7 @@ public class Serveur extends ServerSocket{
 	public static void main(String [] args){
 		try {
 			Serveur.addUser("azerty", "azerty");
-			Serveur s = new Serveur(2048, "");
+			Serveur s = new Serveur(2048, System.getProperty("user.dir"));
 			s.run();
 
 			s.close();
@@ -67,7 +68,4 @@ public class Serveur extends ServerSocket{
 			System.exit(0);
 		}
 	}
-
-
-
 }

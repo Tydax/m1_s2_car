@@ -21,10 +21,13 @@ public class Constants {
 	public static final int CODE_INVALID_PARAM = 501;
 
 	// Messages
-    public static final String MSG_CONNECTION_SUCC = "%d Successfully connected to server\n";
-	public static final String MSG_QUIT = "%d Goodbye!\n";
-	public static final String MSG_WAITING_PASS = "%d Waiting for user password...\n";
-	public static final String MSG_AUTH_FAILED = "%d Authentication failed\n";
-    public static final String MSG_AUTH_NOLOGIN = "%d No username provided\n";
-	public static final String MSG_AUTH_SUCC = "%d Authentication successful\n";
+    public static final String MSG_CONNECTION_SUCC = "%d Successfully connected to server";
+	public static final String MSG_QUIT = "%d Goodbye!";
+	public static final String MSG_WAITING_PASS = "%d Waiting for user password...";
+	public static final String MSG_AUTH_FAILED = "%d Authentication failed";
+    public static final String MSG_AUTH_NOLOGIN = "%d No username provided";
+	public static final String MSG_AUTH_SUCC = "%d Authentication successful";
+
+    // Format
+    public static final String FORM_FILE_LIST = "%s    1 %-10s %-10s %10lu %s %s\r\n";
 }

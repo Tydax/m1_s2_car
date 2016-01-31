@@ -13,7 +13,7 @@ public class FtpRequest extends Thread {
     /** The input reader associated with the socket. */
     private final BufferedReader input;
 
-    /** The output writer associated wit hthe socket. */
+    /** The output writer associated with the socket. */
     private final PrintWriter output;
 
 	/** The folder path of the server */
@@ -74,7 +74,6 @@ public class FtpRequest extends Thread {
         boolean keepOpen = true;
         while (keepOpen) {
             request = this.input.readLine();
-            System.out.println("Message normalement envoyé");
             int ind = request.indexOf(" ");
             final String cmd = ind != -1 ? request.substring(0, ind) : request;
 
@@ -149,12 +148,14 @@ public class FtpRequest extends Thread {
 
     /**
      * Base method to send a generated message with a code and a message.
-     * @param code The code to send.
+     * @param code The code to send, may be null.
      * @param msg The String message to send (must contain a '%d ' to be formatted).
      */
-    protected void processRequestBase(final int code, final String msg) {
-        final String finalMsg = String.format(msg, code);
-        this.output.print(finalMsg);
+    protected void processRequestBase(final Integer code, final String msg) {
+        final String finalMsg = code != null
+                              ? String.format(msg, code)
+                              : msg.substring(3);
+        this.output.println(finalMsg);
         this.output.flush();
 
         final String logMsg = String.format("[Server] Sent message '%s'", finalMsg);
@@ -247,7 +248,7 @@ public class FtpRequest extends Thread {
 	 *            The path to the file to store.
 	 */
 	protected void processSTOR(final String path) {
-		// TODO: implement
+        // TODO: implement
 	}
 
 	/**
@@ -255,7 +256,18 @@ public class FtpRequest extends Thread {
 	 * directory.
 	 */
 	protected void processLIST() {
-        // TODO: implement
+        final StringBuilder builder = new StringBuilder();
+        final File[] files = this.workingDirectory.listFiles();
+
+        for (final File file : files) {
+            if (file.isDirectory()) {
+                builder.append("(D) ");
+            }
+            builder.append(file.getName());
+            builder.append("\n");
+        }
+
+        processRequestBase(null, builder.toString());
 	}
 
 	/**
