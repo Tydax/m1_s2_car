@@ -229,23 +229,23 @@ public class FtpRequest extends Thread {
         logOutput(msg);
     }
 
-	/**
-	 * Processes a command that needs a parameter but was not provided one
-	 *
+    /**
+     * Processes a command that needs a parameter but was not provided one
+     *
      */
-	protected void processNoParamCmd() {
-		processRequestBase(Constants.CODE_INVALID_PARAM, Constants.MSG_NO_PARAM);
-	}
+    protected void processNoParamCmd() {
+        processRequestBase(Constants.CODE_INVALID_PARAM, Constants.MSG_NO_PARAM);
+    }
 
-	/**
-	 * Processes a USER type request, used to provide an username to login.
-	 *
-	 * @param user
-	 *            The provided username name.
-	 * @throws IOException
-	 */
-	protected void processUSER(final String user) throws IOException {
-		final String msg;
+    /**
+     * Processes a USER type request, used to provide an username to login.
+     *
+     * @param user
+     *            The provided username name.
+     * @throws IOException
+     */
+    protected void processUSER(final String user) throws IOException {
+        final String msg;
         final int code;
 
         if (Serveur.users.containsKey(user)) {
@@ -400,9 +400,9 @@ public class FtpRequest extends Thread {
         String tmpPath = workingDirectory.getPath() + "/" + folderPath;
         /*  if(!Files.exists(tmpPath)){
 
-	    }*/
+        }*/
 
         // processRequestBase(Constants.CODE_SYST_INFO, Constants.MSG_SYST_INFO);
-	}
+    }
 }
 
