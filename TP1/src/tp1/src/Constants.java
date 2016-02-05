@@ -10,6 +10,8 @@ public class Constants {
 	public static final String CMD_LIST = "LIST";
 	public static final String CMD_QUIT = "QUIT";
 	public static final String CMD_SYST = "SYST";
+    public static final String CMD_PWD = "PWD";
+    public static final String CMD_CWD = "CWD";
 
 	// Return codes
 	public static final int CODE_SYST_INFO = 215;
@@ -17,6 +19,7 @@ public class Constants {
 	public static final int CODE_TRANSFER_SUCC = 226;
 	public static final int CODE_DISCONNECTION = 221;
 	public static final int CODE_AUTH_SUCC = 230;
+    public static final int CODE_FILEOP_COMPLETED = 250;
 	public static final int CODE_WAITING_PASS = 331;
 	public static final int CODE_AUTH_FAILED = 430;
 	public static final int CODE_INVALID_CMD = 500;
@@ -24,15 +27,17 @@ public class Constants {
 	public static final int CODE_NOT_LOGGED = 530;
 
 	// Messages
-	public static final String MSG_SYST_INFO = "%d Blablabla";
+	public static final String MSG_SYST_INFO = "%d Java Server";
     public static final String MSG_CONNECTION_SUCC = "%d Successfully connected to server";
-	public static final String MSG_QUIT = "%d Goodbye!";
-	public static final String MSG_WAITING_PASS = "%d Waiting for user password...";
-	public static final String MSG_AUTH_FAILED = "%d Authentication failed";
+    public static final String MSG_BASE = "%d ";
+    public static final String MSG_QUIT = "%d Goodbye! Stay safe out there!";
+    public static final String MSG_WAITING_PASS = "%d Waiting for user password...";
+    public static final String MSG_AUTH_FAILED = "%d Authentication failed";
     public static final String MSG_AUTH_NOLOGIN = "%d No username provided";
 	public static final String MSG_AUTH_SUCC = "%d Authentication successful";
-	public static final String MSG_INVALID_CMD = "%d Command unrecognized";
-	public static final String MSG_NOT_LOGGED = "%d Not logged in";
+	public static final String MSG_INVALID_CMD = "%d Command unrecognised";
+    public static final String MSG_NOT_LOGGED = "%d Not logged in";
+    public static final String MSG_NO_PARAM = "%d Parameter is required, none is provided";
 
     // Format
     public static final String FORM_FILE_LIST = "%s    1 %-10s %-10s %10lu %s %s\r\n";

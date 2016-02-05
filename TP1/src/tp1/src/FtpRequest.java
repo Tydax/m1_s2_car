@@ -2,7 +2,6 @@ package tp1.src;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,8 +33,10 @@ public class FtpRequest extends Thread {
             Constants.CMD_STOR,
             Constants.CMD_LIST,
             Constants.CMD_QUIT,
-            Constants.CMD_SYST
-            );
+            Constants.CMD_SYST,
+            Constants.CMD_PWD,
+            Constants.CMD_CWD
+    );
 
     /**
      * Creates a new FtpRequest handling a client by listening to the input received.
@@ -88,14 +89,14 @@ public class FtpRequest extends Thread {
                 System.out.println(String.format("[Server] Command %s received", cmd));
                 if (!LIST_CMDS.contains(cmd)) {
                     // Unrecognised command
-                    processUnrecognisedCmd(cmd);
+                    processUnrecognisedCmd();
                 } else {
                     // Check if a parameter is needed
                     if (isParametrable(cmd)) {
                         // Check if a parameter is provided
                         if (ind == -1) {
                             // No parameter, return error
-                            processNoParamCmd(cmd);
+                            processNoParamCmd();
                         } else {
                             final String param = request.substring(ind + 1);
                             System.out.println("Commande : " + cmd);
@@ -115,6 +116,10 @@ public class FtpRequest extends Thread {
                             case Constants.CMD_RETR:
                                 processRETR(param);
                                 break;
+
+                            default:
+                                processUnrecognisedCmd();
+                                break;
                             }
                         }
                     } else {
@@ -131,10 +136,14 @@ public class FtpRequest extends Thread {
 
                         case Constants.CMD_SYST:
                             processSYST();
-                            break;	
+                            break;
+
+                        case Constants.CMD_PWD:
+                            processPWD();
+                            break;
 
                         default:
-                            processUnrecognisedCmd(cmd);
+                            processUnrecognisedCmd();
                             break;
                         }
                     }
@@ -143,6 +152,15 @@ public class FtpRequest extends Thread {
         }
 
         socket.close();
+    }
+
+    /**
+     * Logs a sent message under the following format: "[Server] Sent message '%s'"
+     * @param msg The sent message.
+     */
+    protected static void logOutput(final String msg) {
+        final String display = String.format("[Server] Sent message '%s'", msg);
+        System.out.println(display);
     }
 
     /**
@@ -155,21 +173,13 @@ public class FtpRequest extends Thread {
      */
     protected static boolean isParametrable(final String cmd) {
         switch (cmd) {
-        case Constants.CMD_LIST:
-        case Constants.CMD_QUIT:
-            return false;
-        default:
-            return true;
+            case Constants.CMD_LIST:
+            case Constants.CMD_QUIT:
+            case Constants.CMD_PWD:
+                return false;
+            default:
+                return true;
         }
-    }
-
-    /**
-     * Logs a sent message under the following format: "[Server] Sent message '%s'"
-     * @param msg The sent message.
-     */
-    protected static void logOutput(final String msg) {
-        final String display = String.format("[Server] Sent message '%s'", msg);
-        System.out.println(display);
     }
 
     /**
@@ -211,35 +221,31 @@ public class FtpRequest extends Thread {
     /**
      * Processes an unrecognised request.
      *
-     * @param cmd
-     *            The unrecognised request.
      */
-    protected void processUnrecognisedCmd(final String cmd) {
+    protected void processUnrecognisedCmd() {
         String msg = String.format(Constants.MSG_INVALID_CMD, Constants.CODE_INVALID_CMD);
         this.output.println(msg);
         this.output.flush();
         logOutput(msg);
     }
 
-    /**
-     * Processes a command that needs a parameter but was not provided one
-     *
-     * @param cmd
-     *            The command
+	/**
+	 * Processes a command that needs a parameter but was not provided one
+	 *
      */
-    protected void processNoParamCmd(final String cmd) {
-        // TODO: implement
-    }
+	protected void processNoParamCmd() {
+		processRequestBase(Constants.CODE_INVALID_PARAM, Constants.MSG_NO_PARAM);
+	}
 
-    /**
-     * Processes a USER type request, used to provide an username to login.
-     *
-     * @param user
-     *            The provided username name.
-     * @throws IOException
-     */
-    protected void processUSER(final String user) throws IOException {
-        final String msg;
+	/**
+	 * Processes a USER type request, used to provide an username to login.
+	 *
+	 * @param user
+	 *            The provided username name.
+	 * @throws IOException
+	 */
+	protected void processUSER(final String user) throws IOException {
+		final String msg;
         final int code;
 
         if (Serveur.users.containsKey(user)) {
@@ -251,9 +257,6 @@ public class FtpRequest extends Thread {
             msg = Constants.MSG_AUTH_FAILED;
         }
 
-        this.output.println(msg);
-        this.output.flush();
-        logOutput(msg);
         processRequestBase(code, msg);
     }
 
@@ -299,6 +302,7 @@ public class FtpRequest extends Thread {
         final byte [] byteArray  = new byte [(int)file.length()];
 
         BufferedInputStream buffFile = new BufferedInputStream(new FileInputStream(file));
+        // TODO Check number of bytes read
         buffFile.read(byteArray, 0, byteArray.length);
         final OutputStream os = socket.getOutputStream();
         System.out.println("Sending " + path + "(" + byteArray.length + " bytes)");
@@ -342,6 +346,7 @@ public class FtpRequest extends Thread {
         bos.write(mybytearray, 0 , current);
         bos.flush();
 
+        // TODO Not sure what this does, check it
         String msg = String.format(Constants.CMD_STOR, Constants.CODE_TRANSFER_SUCC);
         logOutput(msg);
     }
@@ -358,15 +363,17 @@ public class FtpRequest extends Thread {
         final StringBuilder builder = new StringBuilder();
         final File[] files = this.workingDirectory.listFiles();
 
-        for (final File file : files) {
-            if (file.isDirectory()) {
-                builder.append("(D) ");
+        if (files != null) {
+            for (final File file : files) {
+                if (file.isDirectory()) {
+                    builder.append("(D) ");
+                }
+                builder.append(file.getName());
+                builder.append("\n");
             }
-            builder.append(file.getName());
-            builder.append("\n");
         }
 
-        processRequestBase(null, builder.toString());
+        processRequestBase(Constants.CODE_FILEOP_COMPLETED, builder.toString());
     }
 
     /**
@@ -376,6 +383,19 @@ public class FtpRequest extends Thread {
         processRequestBase(Constants.CODE_DISCONNECTION, Constants.MSG_QUIT);
     }
 
+    /**
+     * Processes a PWD type request, used to display the working directory.
+     */
+    protected void processPWD() {
+        if (!checkLoggedIn()) {
+            return;
+        }
+
+        final StringBuilder msg = new StringBuilder(Constants.MSG_BASE);
+        msg.append(this.workingDirectory.getAbsolutePath());
+        processRequestBase(Constants.CODE_FILEOP_COMPLETED, msg.toString());
+    }
+
     protected void processCWD(final String folderPath) throws IOException {
         String tmpPath = workingDirectory.getPath() + "/" + folderPath;
         /*  if(!Files.exists(tmpPath)){
@@ -383,6 +403,6 @@ public class FtpRequest extends Thread {
 	    }*/
 
         // processRequestBase(Constants.CODE_SYST_INFO, Constants.MSG_SYST_INFO);
-    }
+	}
 }
 
