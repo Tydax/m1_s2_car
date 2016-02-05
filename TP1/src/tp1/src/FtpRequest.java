@@ -2,6 +2,7 @@ package tp1.src;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,7 +33,8 @@ public class FtpRequest extends Thread {
 			Constants.CMD_RETR,
 			Constants.CMD_STOR,
 			Constants.CMD_LIST,
-			Constants.CMD_QUIT
+			Constants.CMD_QUIT,
+			Constants.CMD_SYST
 			);
 
 	/**
@@ -76,6 +78,8 @@ public class FtpRequest extends Thread {
 			request = this.input.readLine();
 			int ind = request.indexOf(" ");
 			final String cmd = ind != -1 ? request.substring(0, ind) : request;
+			
+			System.out.println("\"" + cmd + "\"");
 
 			if (cmd == null) {
 				// Invalid cmd
@@ -123,6 +127,14 @@ public class FtpRequest extends Thread {
 						case Constants.CMD_QUIT:
 							processQUIT();
 							keepOpen = false;
+							break;
+
+						case Constants.CMD_SYST:
+                            processSYST();
+                            break;	
+						
+						default:
+							processUnrecognisedCmd(cmd);
 							break;
 						}
 					}
@@ -176,7 +188,10 @@ public class FtpRequest extends Thread {
 	 *            The unrecognised request.
 	 */
 	protected void processUnrecognisedCmd(final String cmd) {
-		// TODO: implement
+		String msg = String.format(Constants.MSG_INVALID_CMD, Constants.CODE_INVALID_CMD);
+		this.output.println(msg);
+		this.output.flush();
+		logOutput(msg);
 	}
 
 	/**
@@ -206,7 +221,7 @@ public class FtpRequest extends Thread {
 			msg = String.format(Constants.MSG_AUTH_FAILED, Constants.CODE_AUTH_FAILED);
 		}
 
-		this.output.print(msg);
+		this.output.println(msg);
 		this.output.flush();
 		logOutput(msg);
 	}
@@ -231,6 +246,11 @@ public class FtpRequest extends Thread {
 			processRequestBase(Constants.CODE_AUTH_FAILED, Constants.MSG_AUTH_NOLOGIN);
 		}
 	}
+	
+	protected void processSYST() throws IOException {
+        processRequestBase(Constants.CODE_SYST_INFO, Constants.MSG_SYST_INFO);
+    }
+	
 
 	/**
 	 * Processes a RETR type request, used to retrieve a file from the server.
@@ -287,7 +307,7 @@ public class FtpRequest extends Thread {
 
 		bos.write(mybytearray, 0 , current);
 		bos.flush();
-		
+
 		String msg = String.format(Constants.CMD_STOR, Constants.CODE_TRANSFER_SUCC);
 		logOutput(msg);
 	}
@@ -317,6 +337,33 @@ public class FtpRequest extends Thread {
 	protected void processQUIT() {
 		processRequestBase(Constants.CODE_DISCONNECTION, Constants.MSG_QUIT);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	protected void processCWD(final String folderPath) throws IOException {
+	    String tmpPath = workingDirectory.getPath() + "/" + folderPath;
+	    if(!Files.exists(tmpPath)){
+	        
+	    }
+	    
+        // processRequestBase(Constants.CODE_SYST_INFO, Constants.MSG_SYST_INFO);
+    }
+	
+	
+	
+	
+	
+	
 
 	protected static void logOutput(final String msg) {
 		final String display = String.format("[Server] Sent message '%s'", msg);

@@ -9,8 +9,10 @@ public class Constants {
 	public static final String CMD_STOR = "STOR";
 	public static final String CMD_LIST = "LIST";
 	public static final String CMD_QUIT = "QUIT";
+	public static final String CMD_SYST = "SYST";
 
 	// Return codes
+	public static final int CODE_SYST_INFO = 215;
 	public static final int CODE_CONNECTION_SUCC = 220;
 	public static final int CODE_TRANSFER_SUCC = 226;
 	public static final int CODE_DISCONNECTION = 221;
@@ -21,12 +23,14 @@ public class Constants {
 	public static final int CODE_INVALID_PARAM = 501;
 
 	// Messages
+	public static final String MSG_SYST_INFO = "%d Blablabla";
     public static final String MSG_CONNECTION_SUCC = "%d Successfully connected to server";
 	public static final String MSG_QUIT = "%d Goodbye!";
 	public static final String MSG_WAITING_PASS = "%d Waiting for user password...";
 	public static final String MSG_AUTH_FAILED = "%d Authentication failed";
     public static final String MSG_AUTH_NOLOGIN = "%d No username provided";
 	public static final String MSG_AUTH_SUCC = "%d Authentication successful";
+	public static final String MSG_INVALID_CMD = "%d Command unrecognized";
 
     // Format
     public static final String FORM_FILE_LIST = "%s    1 %-10s %-10s %10lu %s %s\r\n";
