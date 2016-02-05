@@ -19,6 +19,7 @@ public class Constants {
 	public static final int CODE_AUTH_FAILED = 430;
 	public static final int CODE_INVALID_CMD = 500;
 	public static final int CODE_INVALID_PARAM = 501;
+	public static final int CODE_NOT_LOGGED = 530;
 
 	// Messages
     public static final String MSG_CONNECTION_SUCC = "%d Successfully connected to server";
@@ -27,6 +28,7 @@ public class Constants {
 	public static final String MSG_AUTH_FAILED = "%d Authentication failed";
     public static final String MSG_AUTH_NOLOGIN = "%d No username provided";
 	public static final String MSG_AUTH_SUCC = "%d Authentication successful";
+	public static final String MSG_NOT_LOGGED = "%d Not logged in";
 
     // Format
     public static final String FORM_FILE_LIST = "%s    1 %-10s %-10s %10lu %s %s\r\n";

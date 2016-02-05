@@ -33,7 +33,7 @@ public class FtpRequest extends Thread {
 			Constants.CMD_STOR,
 			Constants.CMD_LIST,
 			Constants.CMD_QUIT
-			);
+    );
 
 	/**
 	 * Creates a new FtpRequest handling a client by listening to the input received.
@@ -135,32 +135,59 @@ public class FtpRequest extends Thread {
 
 	/**
 	 * Checks if a command needs a parameter or not.
-	 * 
+	 *
 	 * @param cmd
 	 *            The command to check.
 	 * @return <code>true</code> if the command needs a parameter; <br>
 	 *         <code>false</code> else.
 	 */
 	protected static boolean isParametrable(final String cmd) {
-		return cmd.equals("USER") || cmd.equals("PASS") || cmd.equals("RETR")
-				|| cmd.equals("STOR");
+		switch (cmd) {
+            case Constants.CMD_LIST:
+            case Constants.CMD_QUIT:
+                return false;
+            default:
+                return true;
+        }
 	}
 
-	/**
-	 * Base method to send a generated message with a code and a message.
-	 * @param code The code to send, may be null.
-	 * @param msg The String message to send (must contain a '%d ' to be formatted).
-	 */
-	protected void processRequestBase(final Integer code, final String msg) {
-		final String finalMsg = code != null
-				? String.format(msg, code)
-						: msg.substring(3);
-				this.output.println(finalMsg);
-				this.output.flush();
+    /**
+     * Logs a sent message under the following format: "[Server] Sent message '%s'"
+     * @param msg The sent message.
+     */
+    protected static void logOutput(final String msg) {
+        final String display = String.format("[Server] Sent message '%s'", msg);
+        System.out.println(display);
+    }
 
-				final String logMsg = String.format("[Server] Sent message '%s'", finalMsg);
-				logOutput(logMsg);
-	}
+    /**
+     * Checks if the user is logged in. Sent an error message if he is not.
+     * @return <code>true</code> if the user is logged in; <br>
+     *         <code>false</code> else.
+     */
+    protected boolean checkLoggedIn() {
+        if (!authenticated) {
+            processRequestBase(Constants.CODE_NOT_LOGGED, Constants.MSG_NOT_LOGGED);
+        }
+
+        return authenticated;
+    }
+
+    /**
+     * Base method to send a generated message with a code and a message.
+     * @param code The code to send, may be null.
+     * @param msg The String message to send (must contain a '%d ' to be formatted).
+     */
+    protected void processRequestBase(final Integer code, final String msg) {
+        final String finalMsg = code != null
+                              ? String.format(msg, code)
+                              : msg.substring(3);
+        this.output.println(finalMsg);
+        this.output.flush();
+
+        final String logMsg = String.format("[Server] Sent message '%s'", finalMsg);
+        logOutput(logMsg);
+    }
 
 	/**
 	 * Treats case where an invalid request was provided.
@@ -171,7 +198,7 @@ public class FtpRequest extends Thread {
 
 	/**
 	 * Processes an unrecognised request.
-	 * 
+	 *
 	 * @param cmd
 	 *            The unrecognised request.
 	 */
@@ -181,7 +208,7 @@ public class FtpRequest extends Thread {
 
 	/**
 	 * Processes a command that needs a parameter but was not provided one
-	 * 
+	 *
 	 * @param cmd
 	 *            The command
 	 */
@@ -191,29 +218,30 @@ public class FtpRequest extends Thread {
 
 	/**
 	 * Processes a USER type request, used to provide an username to login.
-	 * 
+	 *
 	 * @param user
 	 *            The provided username name.
 	 * @throws IOException
 	 */
 	protected void processUSER(final String user) throws IOException {
 		final String msg;
+        final int code;
 
 		if (Serveur.users.containsKey(user)) {
 			this.username = user;
-			msg = String.format(Constants.MSG_WAITING_PASS, Constants.CODE_WAITING_PASS);
+            code = Constants.CODE_WAITING_PASS;
+			msg = Constants.MSG_WAITING_PASS;
 		} else {
-			msg = String.format(Constants.MSG_AUTH_FAILED, Constants.CODE_AUTH_FAILED);
+            code = Constants.CODE_AUTH_FAILED;
+			msg = Constants.MSG_AUTH_FAILED;
 		}
 
-		this.output.print(msg);
-		this.output.flush();
-		logOutput(msg);
+		processRequestBase(code, msg);
 	}
 
 	/**
 	 * Processes a PASS type request, used to provide a password to login.
-	 * 
+	 *
 	 * @param pass
 	 *            The provided password.
 	 * @throws IOException
@@ -234,39 +262,42 @@ public class FtpRequest extends Thread {
 
 	/**
 	 * Processes a RETR type request, used to retrieve a file from the server.
-	 * 
+	 *
 	 * @param path
 	 *            The path to the file to retrieve.
 	 * @throws IOException 
 	 */
 	protected void processRETR(final String path) throws IOException {
-		/*if(!authenticated){
+        if (!checkLoggedIn()) {
+            return;
+        }
 
-		}*/
-
-
-		File file = new File (path);
-		byte [] byteArray  = new byte [(int)file.length()];
+		final File file = new File (path);
+		final byte [] byteArray  = new byte [(int)file.length()];
 
 		BufferedInputStream buffFile = new BufferedInputStream(new FileInputStream(file));
 		buffFile.read(byteArray, 0, byteArray.length);
-		OutputStream os = socket.getOutputStream();
+		final OutputStream os = socket.getOutputStream();
 		System.out.println("Sending " + path + "(" + byteArray.length + " bytes)");
 		os.write(byteArray, 0, byteArray.length);
 		os.flush();
 		System.out.println("Done.");
 
-		String msg = String.format(Constants.CMD_RETR, Constants.CODE_TRANSFER_SUCC);
+		final String msg = String.format(Constants.CMD_RETR, Constants.CODE_TRANSFER_SUCC);
 		logOutput(msg);
 	}
 
 	/**
 	 * Processes a STOR type request, used to upload a file to the server.
-	 * 
+	 *
 	 * @param path
 	 *            The path to the file to store.
 	 */
-	protected void processSTOR(final String path) throws IOException{
+	protected void processSTOR(final String path) throws IOException {
+        if (!checkLoggedIn()) {
+            return;
+        }
+
 		int bytesRead;
 
 		System.out.println("Connecting...");
@@ -297,18 +328,22 @@ public class FtpRequest extends Thread {
 	 * directory.
 	 */
 	protected void processLIST() {
-		final StringBuilder builder = new StringBuilder();
-		final File[] files = this.workingDirectory.listFiles();
+        if (!checkLoggedIn()) {
+            return;
+        }
 
-		for (final File file : files) {
-			if (file.isDirectory()) {
-				builder.append("(D) ");
-			}
-			builder.append(file.getName());
-			builder.append("\n");
-		}
+        final StringBuilder builder = new StringBuilder();
+        final File[] files = this.workingDirectory.listFiles();
 
-		processRequestBase(null, builder.toString());
+        for (final File file : files) {
+            if (file.isDirectory()) {
+                builder.append("(D) ");
+            }
+            builder.append(file.getName());
+            builder.append("\n");
+        }
+
+        processRequestBase(null, builder.toString());
 	}
 
 	/**
@@ -316,10 +351,5 @@ public class FtpRequest extends Thread {
 	 */
 	protected void processQUIT() {
 		processRequestBase(Constants.CODE_DISCONNECTION, Constants.MSG_QUIT);
-	}
-
-	protected static void logOutput(final String msg) {
-		final String display = String.format("[Server] Sent message '%s'", msg);
-		System.out.println(display);
 	}
 }
