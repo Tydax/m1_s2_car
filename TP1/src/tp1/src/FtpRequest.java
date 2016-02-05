@@ -7,14 +7,14 @@ import java.util.List;
 
 public class FtpRequest extends Thread {
 
-    /** The socket which represents the connexion with the client */
-    private final Socket socket;
+	/** The socket which represents the connexion with the client */
+	private final Socket socket;
 
-    /** The input reader associated with the socket. */
-    private final BufferedReader input;
+	/** The input reader associated with the socket. */
+	private final BufferedReader input;
 
-    /** The output writer associated with the socket. */
-    private final PrintWriter output;
+	/** The output writer associated with the socket. */
+	private final PrintWriter output;
 
 	/** The folder path of the server */
 	private final File workingDirectory;
@@ -28,27 +28,27 @@ public class FtpRequest extends Thread {
 	/** List of possible commands */
 	private static final List<String> LIST_CMDS = Arrays.asList(
 			Constants.CMD_USER,
-            Constants.CMD_PASS,
-            Constants.CMD_RETR,
+			Constants.CMD_PASS,
+			Constants.CMD_RETR,
 			Constants.CMD_STOR,
-            Constants.CMD_LIST,
-            Constants.CMD_QUIT
-    );
+			Constants.CMD_LIST,
+			Constants.CMD_QUIT
+			);
 
-    /**
-     * Creates a new FtpRequest handling a client by listening to the input received.
-     * @param socket The socket used to listen.
-     * @param workingDirectoryPath The path to working directory.
-     * @throws IOException
-     */
+	/**
+	 * Creates a new FtpRequest handling a client by listening to the input received.
+	 * @param socket The socket used to listen.
+	 * @param workingDirectoryPath The path to working directory.
+	 * @throws IOException
+	 */
 	public FtpRequest(final Socket socket, final String workingDirectoryPath) throws IOException {
 		super();
 		this.socket = socket;
-        this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.output = new PrintWriter(socket.getOutputStream(),
-                true);
-        this.workingDirectory = new File(workingDirectoryPath);
-        this.authenticated = false;
+		this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		this.output = new PrintWriter(socket.getOutputStream(),
+				true);
+		this.workingDirectory = new File(workingDirectoryPath);
+		this.authenticated = false;
 	}
 
 	/**
@@ -70,65 +70,65 @@ public class FtpRequest extends Thread {
 	 * @throws IOException
 	 */
 	public void processRequest() throws IOException {
-        String request;
-        boolean keepOpen = true;
-        while (keepOpen) {
-            request = this.input.readLine();
-            int ind = request.indexOf(" ");
-            final String cmd = ind != -1 ? request.substring(0, ind) : request;
+		String request;
+		boolean keepOpen = true;
+		while (keepOpen) {
+			request = this.input.readLine();
+			int ind = request.indexOf(" ");
+			final String cmd = ind != -1 ? request.substring(0, ind) : request;
 
-            if (cmd == null) {
-                // Invalid cmd
-                processNoCmd();
-            } else {
-                System.out.println(String.format("[Server] Command %s received", cmd));
-                if (!LIST_CMDS.contains(cmd)) {
-                    // Unrecognised command
-                    processUnrecognisedCmd(cmd);
-                } else {
-                    // Check if a parameter is needed
-                    if (isParametrable(cmd)) {
-                        // Check if a parameter is provided
-                        if (ind == -1) {
-                            // No parameter, return error
-                            processNoParamCmd(cmd);
-                        } else {
-                            final String param = request.substring(ind + 1);
-                            System.out.println("Commande : " + cmd);
-                            switch (cmd) {
-                                case Constants.CMD_USER:
-                                    processUSER(param);
-                                    break;
+			if (cmd == null) {
+				// Invalid cmd
+				processNoCmd();
+			} else {
+				System.out.println(String.format("[Server] Command %s received", cmd));
+				if (!LIST_CMDS.contains(cmd)) {
+					// Unrecognised command
+					processUnrecognisedCmd(cmd);
+				} else {
+					// Check if a parameter is needed
+					if (isParametrable(cmd)) {
+						// Check if a parameter is provided
+						if (ind == -1) {
+							// No parameter, return error
+							processNoParamCmd(cmd);
+						} else {
+							final String param = request.substring(ind + 1);
+							System.out.println("Commande : " + cmd);
+							switch (cmd) {
+							case Constants.CMD_USER:
+								processUSER(param);
+								break;
 
-                                case Constants.CMD_PASS:
-                                    processPASS(param);
-                                    break;
+							case Constants.CMD_PASS:
+								processPASS(param);
+								break;
 
-                                case Constants.CMD_STOR:
-                                    processSTOR(param);
-                                    break;
+							case Constants.CMD_STOR:
+								processSTOR(param);
+								break;
 
-                                case Constants.CMD_RETR:
-                                    processRETR(param);
-                                    break;
-                            }
-                        }
-                    } else {
-                        // No parameter is needed
-                        switch (cmd) {
-                            case Constants.CMD_LIST:
-                                processLIST();
-                                break;
+							case Constants.CMD_RETR:
+								processRETR(param);
+								break;
+							}
+						}
+					} else {
+						// No parameter is needed
+						switch (cmd) {
+						case Constants.CMD_LIST:
+							processLIST();
+							break;
 
-                            case Constants.CMD_QUIT:
-                                processQUIT();
-                                keepOpen = false;
-                                break;
-                        }
-                    }
-                }
-            }
-        }
+						case Constants.CMD_QUIT:
+							processQUIT();
+							keepOpen = false;
+							break;
+						}
+					}
+				}
+			}
+		}
 
 		socket.close();
 	}
@@ -146,21 +146,21 @@ public class FtpRequest extends Thread {
 				|| cmd.equals("STOR");
 	}
 
-    /**
-     * Base method to send a generated message with a code and a message.
-     * @param code The code to send, may be null.
-     * @param msg The String message to send (must contain a '%d ' to be formatted).
-     */
-    protected void processRequestBase(final Integer code, final String msg) {
-        final String finalMsg = code != null
-                              ? String.format(msg, code)
-                              : msg.substring(3);
-        this.output.println(finalMsg);
-        this.output.flush();
+	/**
+	 * Base method to send a generated message with a code and a message.
+	 * @param code The code to send, may be null.
+	 * @param msg The String message to send (must contain a '%d ' to be formatted).
+	 */
+	protected void processRequestBase(final Integer code, final String msg) {
+		final String finalMsg = code != null
+				? String.format(msg, code)
+						: msg.substring(3);
+				this.output.println(finalMsg);
+				this.output.flush();
 
-        final String logMsg = String.format("[Server] Sent message '%s'", finalMsg);
-        logOutput(logMsg);
-    }
+				final String logMsg = String.format("[Server] Sent message '%s'", finalMsg);
+				logOutput(logMsg);
+	}
 
 	/**
 	 * Treats case where an invalid request was provided.
@@ -197,18 +197,18 @@ public class FtpRequest extends Thread {
 	 * @throws IOException
 	 */
 	protected void processUSER(final String user) throws IOException {
-        final String msg;
+		final String msg;
 
 		if (Serveur.users.containsKey(user)) {
 			this.username = user;
-            msg = String.format(Constants.MSG_WAITING_PASS, Constants.CODE_WAITING_PASS);
+			msg = String.format(Constants.MSG_WAITING_PASS, Constants.CODE_WAITING_PASS);
 		} else {
-            msg = String.format(Constants.MSG_AUTH_FAILED, Constants.CODE_AUTH_FAILED);
-        }
+			msg = String.format(Constants.MSG_AUTH_FAILED, Constants.CODE_AUTH_FAILED);
+		}
 
-        this.output.print(msg);
-        this.output.flush();
-        logOutput(msg);
+		this.output.print(msg);
+		this.output.flush();
+		logOutput(msg);
 	}
 
 	/**
@@ -219,16 +219,17 @@ public class FtpRequest extends Thread {
 	 * @throws IOException
 	 */
 	protected void processPASS(final String pass) throws IOException {
-        if (this.username != null) {
-            if (Serveur.users.get(username).equals(pass)) {
-                processRequestBase(Constants.CODE_AUTH_SUCC, Constants.MSG_AUTH_SUCC);
-            } else {
-                processRequestBase(Constants.CODE_AUTH_FAILED, Constants.MSG_AUTH_FAILED);
-            }
-        } else {
-            // Username not provided
-            processRequestBase(Constants.CODE_AUTH_FAILED, Constants.MSG_AUTH_NOLOGIN);
-        }
+		if (this.username != null) {
+			if (Serveur.users.get(username).equals(pass)) {
+				processRequestBase(Constants.CODE_AUTH_SUCC, Constants.MSG_AUTH_SUCC);
+				authenticated = true;
+			} else {
+				processRequestBase(Constants.CODE_AUTH_FAILED, Constants.MSG_AUTH_FAILED);
+			}
+		} else {
+			// Username not provided
+			processRequestBase(Constants.CODE_AUTH_FAILED, Constants.MSG_AUTH_NOLOGIN);
+		}
 	}
 
 	/**
@@ -236,9 +237,27 @@ public class FtpRequest extends Thread {
 	 * 
 	 * @param path
 	 *            The path to the file to retrieve.
+	 * @throws IOException 
 	 */
-	protected void processRETR(final String path) {
-		// TODO: implement
+	protected void processRETR(final String path) throws IOException {
+		/*if(!authenticated){
+
+		}*/
+
+
+		File file = new File (path);
+		byte [] byteArray  = new byte [(int)file.length()];
+
+		BufferedInputStream buffFile = new BufferedInputStream(new FileInputStream(file));
+		buffFile.read(byteArray, 0, byteArray.length);
+		OutputStream os = socket.getOutputStream();
+		System.out.println("Sending " + path + "(" + byteArray.length + " bytes)");
+		os.write(byteArray, 0, byteArray.length);
+		os.flush();
+		System.out.println("Done.");
+
+		String msg = String.format(Constants.CMD_RETR, Constants.CODE_TRANSFER_SUCC);
+		logOutput(msg);
 	}
 
 	/**
@@ -247,8 +266,30 @@ public class FtpRequest extends Thread {
 	 * @param path
 	 *            The path to the file to store.
 	 */
-	protected void processSTOR(final String path) {
-        // TODO: implement
+	protected void processSTOR(final String path) throws IOException{
+		int bytesRead;
+
+		System.out.println("Connecting...");
+
+		// receive file
+		File file = new File(path);
+		byte [] mybytearray  = new byte [(int)file.length()];
+		InputStream is = socket.getInputStream();
+		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+		bytesRead = is.read(mybytearray,0,mybytearray.length);
+		int current = bytesRead;
+
+		do {
+			bytesRead =
+					is.read(mybytearray, current, (mybytearray.length-current));
+			if(bytesRead >= 0) current += bytesRead;
+		} while(bytesRead > -1);
+
+		bos.write(mybytearray, 0 , current);
+		bos.flush();
+		
+		String msg = String.format(Constants.CMD_STOR, Constants.CODE_TRANSFER_SUCC);
+		logOutput(msg);
 	}
 
 	/**
@@ -256,29 +297,29 @@ public class FtpRequest extends Thread {
 	 * directory.
 	 */
 	protected void processLIST() {
-        final StringBuilder builder = new StringBuilder();
-        final File[] files = this.workingDirectory.listFiles();
+		final StringBuilder builder = new StringBuilder();
+		final File[] files = this.workingDirectory.listFiles();
 
-        for (final File file : files) {
-            if (file.isDirectory()) {
-                builder.append("(D) ");
-            }
-            builder.append(file.getName());
-            builder.append("\n");
-        }
+		for (final File file : files) {
+			if (file.isDirectory()) {
+				builder.append("(D) ");
+			}
+			builder.append(file.getName());
+			builder.append("\n");
+		}
 
-        processRequestBase(null, builder.toString());
+		processRequestBase(null, builder.toString());
 	}
 
 	/**
 	 * Processes a QUIT type request, used to quit from the server.
 	 */
 	protected void processQUIT() {
-        processRequestBase(Constants.CODE_DISCONNECTION, Constants.MSG_QUIT);
+		processRequestBase(Constants.CODE_DISCONNECTION, Constants.MSG_QUIT);
 	}
 
-    protected static void logOutput(final String msg) {
-        final String display = String.format("[Server] Sent message '%s'", msg);
-        System.out.println(display);
-    }
+	protected static void logOutput(final String msg) {
+		final String display = String.format("[Server] Sent message '%s'", msg);
+		System.out.println(display);
+	}
 }
