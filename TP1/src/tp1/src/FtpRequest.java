@@ -1,7 +1,24 @@
 package tp1.src;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,13 +34,16 @@ public class FtpRequest extends Thread {
     private final PrintWriter output;
 
     /** The folder path of the server */
-    private final File workingDirectory;
+    private File workingDirectory;
 
     /** The username */
     private String username;
 
     /** <code>true</code> if the username is authenticated, <code>false</code> else. */
     private boolean authenticated;
+    
+    /** The port on which we will send the files */
+    final private int port = 4096;
 
     /** List of possible commands */
     private static final List<String> LIST_CMDS = Arrays.asList(
@@ -35,7 +55,8 @@ public class FtpRequest extends Thread {
             Constants.CMD_QUIT,
             Constants.CMD_SYST,
             Constants.CMD_PWD,
-            Constants.CMD_CWD
+            Constants.CMD_CWD,
+            Constants.CMD_CDUP
     );
 
     /**
@@ -99,7 +120,6 @@ public class FtpRequest extends Thread {
                             processNoParamCmd();
                         } else {
                             final String param = request.substring(ind + 1);
-                            System.out.println("Commande : " + cmd);
                             switch (cmd) {
                             case Constants.CMD_USER:
                                 processUSER(param);
@@ -117,6 +137,10 @@ public class FtpRequest extends Thread {
                                 processRETR(param);
                                 break;
 
+                            case Constants.CMD_CWD:
+                                processCWD(param);
+                                break;
+                                
                             default:
                                 processUnrecognisedCmd();
                                 break;
@@ -141,7 +165,11 @@ public class FtpRequest extends Thread {
                         case Constants.CMD_PWD:
                             processPWD();
                             break;
-
+                            
+                        case Constants.CMD_CDUP:
+                            processCDUP();
+                            break;
+                            
                         default:
                             processUnrecognisedCmd();
                             break;
@@ -297,21 +325,25 @@ public class FtpRequest extends Thread {
         if (!checkLoggedIn()) {
             return;
         }
+        
+        System.out.println("Path : " + path);
 
         final File file = new File (path);
         final byte [] byteArray  = new byte [(int)file.length()];
-
         BufferedInputStream buffFile = new BufferedInputStream(new FileInputStream(file));
-        // TODO Check number of bytes read
         buffFile.read(byteArray, 0, byteArray.length);
-        final OutputStream os = socket.getOutputStream();
-        System.out.println("Sending " + path + "(" + byteArray.length + " bytes)");
-        os.write(byteArray, 0, byteArray.length);
-        os.flush();
-        System.out.println("Done.");
-
+        
+        
+        DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream());
+        Socket socket = new Socket(InetAddress.getByName(this.socket.getLocalAddress().getHostAddress()), this.port);
+        for(int i=0;i<byteArray.length;i++){
+            dataOut.write(byteArray, i, 1);
+            dataOut.flush();
+        }
         final String msg = String.format(Constants.CMD_RETR, Constants.CODE_TRANSFER_SUCC);
         logOutput(msg);
+        
+        buffFile.close();
     }
 
     /**
@@ -362,6 +394,7 @@ public class FtpRequest extends Thread {
 
         final StringBuilder builder = new StringBuilder();
         final File[] files = this.workingDirectory.listFiles();
+        //this.workingDirectory.listFiles()
 
         if (files != null) {
             for (final File file : files) {
@@ -397,12 +430,19 @@ public class FtpRequest extends Thread {
     }
 
     protected void processCWD(final String folderPath) throws IOException {
-        String tmpPath = workingDirectory.getPath() + "/" + folderPath;
-        /*  if(!Files.exists(tmpPath)){
-
-        }*/
-
-        // processRequestBase(Constants.CODE_SYST_INFO, Constants.MSG_SYST_INFO);
+        Path tmpPath = Paths.get(workingDirectory.getPath() + "/" + folderPath);
+        
+        if(Files.exists(tmpPath, LinkOption.NOFOLLOW_LINKS)){
+           workingDirectory = new File(tmpPath.toString());
+           processRequestBase(Constants.CODE_FILEOP_COMPLETED, "%d " + workingDirectory.getAbsolutePath());
+           
+        } else {
+           processRequestBase(Constants.CODE_REQUEST_NO_EXECUTED, Constants.MSG_NO_SUCH_FOLDER);
+        }
+    }
+    
+    protected void processCDUP() throws IOException {
+        processCWD("..");
     }
 }
 

@@ -12,6 +12,7 @@ public class Constants {
     public static final String CMD_SYST = "SYST";
     public static final String CMD_PWD = "PWD";
     public static final String CMD_CWD = "CWD";
+    public static final String CMD_CDUP = "CDUP";
 
     // Return codes
     public static final int CODE_SYST_INFO = 215;
@@ -25,6 +26,7 @@ public class Constants {
     public static final int CODE_INVALID_CMD = 500;
     public static final int CODE_INVALID_PARAM = 501;
     public static final int CODE_NOT_LOGGED = 530;
+    public static final int CODE_REQUEST_NO_EXECUTED = 530;
 
     // Messages
     public static final String MSG_SYST_INFO = "%d Java Server";
@@ -38,6 +40,8 @@ public class Constants {
     public static final String MSG_INVALID_CMD = "%d Command unrecognised";
     public static final String MSG_NOT_LOGGED = "%d Not logged in";
     public static final String MSG_NO_PARAM = "%d Parameter is required, none is provided";
+    public static final String MSG_NO_SUCH_FOLDER = "%d Folder is not existing";
+
 
     // Format
     public static final String FORM_FILE_LIST = "%s    1 %-10s %-10s %10lu %s %s\r\n";
