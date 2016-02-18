@@ -13,8 +13,12 @@ public class Constants {
     public static final String CMD_PWD = "PWD";
     public static final String CMD_CWD = "CWD";
     public static final String CMD_CDUP = "CDUP";
+    public static final String CMD_PORT = "PORT";
+    
 
     // Return codes
+    public static final int CODE_BEGIN_TRANSFERT = 125;
+    public static final int CODE_SERVICE_OK = 200;
     public static final int CODE_SYST_INFO = 215;
     public static final int CODE_CONNECTION_SUCC = 220;
     public static final int CODE_TRANSFER_SUCC = 226;
@@ -29,6 +33,7 @@ public class Constants {
     public static final int CODE_REQUEST_NO_EXECUTED = 530;
 
     // Messages
+
     public static final String MSG_SYST_INFO = "%d Java Server";
     public static final String MSG_CONNECTION_SUCC = "%d Successfully connected to server";
     public static final String MSG_BASE = "%d ";
@@ -41,6 +46,9 @@ public class Constants {
     public static final String MSG_NOT_LOGGED = "%d Not logged in";
     public static final String MSG_NO_PARAM = "%d Parameter is required, none is provided";
     public static final String MSG_NO_SUCH_FOLDER = "%d Folder is not existing";
+    public static final String MSG_TRANSFERT_STARTED = "%d Transfert started";
+    public static final String MSG_TRANSFERT_SUCCESSFULL = "%d Transfert successfully completed";
+
 
 
     // Format
