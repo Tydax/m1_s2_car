@@ -26,6 +26,7 @@ public class Constants {
     public static final int CODE_AUTH_SUCC = 230;
     public static final int CODE_FILEOP_COMPLETED = 250;
     public static final int CODE_WAITING_PASS = 331;
+    public static final int CODE_TRANS_IMPO = 425;
     public static final int CODE_AUTH_FAILED = 430;
     public static final int CODE_INVALID_CMD = 500;
     public static final int CODE_INVALID_PARAM = 501;
@@ -48,6 +49,7 @@ public class Constants {
     public static final String MSG_NO_SUCH_FOLDER = "%d Folder is not existing";
     public static final String MSG_TRANSFERT_STARTED = "%d Transfert started";
     public static final String MSG_TRANSFERT_SUCCESSFULL = "%d Transfert successfully completed";
+    public static final String MSG_TRANSFERT_UNCOMPLETED = "%d Unable to complete the transfert";
 
 
 

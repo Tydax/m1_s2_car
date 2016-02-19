@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class Serveur extends ServerSocket{
 
-    public static final Map<String, String> users = new HashMap<>();
+    public final Map<String, String> users = new HashMap<>();
 
     public String folderPath;
 
@@ -26,8 +26,8 @@ public class Serveur extends ServerSocket{
 
     }
 
-    public static void addUser(String user, String password){
-        Serveur.users.put(user, password);
+    public void addUser(String user, String password){
+        users.put(user, password);
     }
 
     /**
@@ -50,16 +50,20 @@ public class Serveur extends ServerSocket{
             socket.getInputStream();
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            final FtpRequest ftpRequest = new FtpRequest(socket, folderPath);
+            final FtpRequest ftpRequest = new FtpRequest(this, socket, folderPath);
             ftpRequest.start();
         }
     }
-
-
+    
+    public String getFolderPath(){
+    	return folderPath;
+    }
+    
     public static void main(String [] args){
         try {
-            Serveur.addUser("azerty", "azerty");
             Serveur s = new Serveur(2048, System.getProperty("user.dir"));
+            s.addUser("azerty", "azerty");
+
             s.run();
 
             s.close();
