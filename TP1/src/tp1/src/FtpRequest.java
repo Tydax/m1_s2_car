@@ -1,20 +1,14 @@
 package tp1.src;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -90,7 +84,7 @@ public class FtpRequest extends Thread {
 	}
 
 	/**
-	 * Calls the {@link #processRequest()} method.
+	 * Calls the {@link #processRequests()} method.
 	 */
 	@Override
 	public void run() {
@@ -254,30 +248,36 @@ public class FtpRequest extends Thread {
 	 * Send a message to the data port of the client.
 	 * @param msg message send to the client.
 	 */
-	private String sendData(String msg) {
+	private String sendData(final String msg) {
 		processRequestBase(Constants.CODE_BEGIN_TRANSFERT, "%d");
+        if (socketData == null) {
+            return processRequestBase(Constants.CODE_TRANS_IMPO, Constants.MSG_TRANSFER_UNCOMPLETED);
+        }
 		try {
 			OutputStreamWriter outputWriterData = new OutputStreamWriter(socketData.getOutputStream());
 			outputWriterData.write(msg);
 			outputWriterData.flush();
 			socketData.close();
 		} catch (IOException e) {
-			return processRequestBase(Constants.CODE_TRANS_IMPO, Constants.MSG_TRANSFERT_UNCOMPLETED);
+			return processRequestBase(Constants.CODE_TRANS_IMPO, Constants.MSG_TRANSFER_UNCOMPLETED);
 		}
-		return processRequestBase(Constants.CODE_TRANSFER_SUCC, Constants.MSG_TRANSFERT_SUCCESSFULL);
+		return processRequestBase(Constants.CODE_TRANSFER_SUCC, Constants.MSG_TRANSFER_SUCCESSFUL);
 	}
 
 
 	private String receiveData() {
 		System.out.println("Inside receive data");
-		processRequestBase(Constants.CODE_BEGIN_TRANSFERT, Constants.MSG_TRANSFERT_STARTED);
+		processRequestBase(Constants.CODE_BEGIN_TRANSFERT, Constants.MSG_TRANSFER_STARTED);
+        if (socketData == null) {
+            return null;
+        }
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(socketData.getInputStream()));
 			String res = "", tmp;
 			while ((tmp = br.readLine()) != null) {
 				res += tmp + "\n";
 			}
-			processRequestBase(Constants.CODE_TRANSFER_SUCC, Constants.MSG_TRANSFERT_SUCCESSFULL);
+			processRequestBase(Constants.CODE_TRANSFER_SUCC, Constants.MSG_TRANSFER_SUCCESSFUL);
 			System.out.println(res);
 			return res;
 		} catch (IOException e) {
@@ -296,7 +296,7 @@ public class FtpRequest extends Thread {
 	protected String processRequestBase(final Integer code, final String msg) {
 		final String finalMsg = code != null
 				? String.format(msg, code)
-						: msg.substring(3);
+				: msg.substring(3);
 				this.output.println(finalMsg);
 				this.output.flush();
 
@@ -326,7 +326,7 @@ public class FtpRequest extends Thread {
 	/** 
 	 * Processes the PORT command. Used to get the ports on which to send and receive the data
 	 */
-	public String processPORT(String cmd) {
+	public String processPORT(final String cmd) {
 		System.out.println("CMD PORT : " + cmd);
 		String[] tmpPort = cmd.split(",");
 		String tmp = "";
@@ -338,7 +338,6 @@ public class FtpRequest extends Thread {
 		try {
 			socketData = new Socket(tmp, port);
 			return processRequestBase(Constants.CODE_SERVICE_OK, "%d");
-
 		} catch (Exception e) {
 			return processRequestBase(Constants.CODE_INVALID_PARAM, "%d");
 		}
@@ -405,7 +404,7 @@ public class FtpRequest extends Thread {
 	/**
 	 * Processes a RETR type request, used to retrieve a file from the server.
 	 *
-	 * @param path
+	 * @param filename
 	 *            The path to the file to retrieve.
 	 * @throws IOException 
 	 */
@@ -429,7 +428,7 @@ public class FtpRequest extends Thread {
 			
 			return sendData(tmp);
 		} catch (Exception e) {
-			return processRequestBase(Constants.CODE_TRANS_IMPO, Constants.MSG_TRANSFERT_UNCOMPLETED);
+			return processRequestBase(Constants.CODE_TRANS_IMPO, Constants.MSG_TRANSFER_UNCOMPLETED);
 		}
 		
 
@@ -438,23 +437,23 @@ public class FtpRequest extends Thread {
 	/**
 	 * Processes a STOR type request, used to upload a file to the server.
 	 *
-	 * @param path
+	 * @param filename
 	 *            The path to the file to store.
 	 */
 	protected String processSTOR(final String filename) throws IOException {
-		File fichier = new File(workingDirectory.getPath() + "/" + filename);
-		String data = receiveData();
+		final File fichier = new File(workingDirectory.getPath() + "/" + filename);
+		final String data = receiveData();
 		if (data == null)
-			return "";
+			return processRequestBase(Constants.CODE_TRANS_IMPO, Constants.MSG_TRANSFER_UNCOMPLETED);
 		try {
 			fichier.createNewFile();
 			FileOutputStream output = new FileOutputStream(fichier);
 			output.write(data.getBytes());
 			output.close();
-		} catch (IOException e) {
-			return processRequestBase(Constants.CODE_TRANS_IMPO, Constants.MSG_TRANSFERT_UNCOMPLETED);
+		} catch (final IOException e) {
+			return processRequestBase(Constants.CODE_TRANS_IMPO, Constants.MSG_TRANSFER_UNCOMPLETED);
 		}
-		String msg = String.format(Constants.CMD_STOR, Constants.CODE_TRANSFER_SUCC);
+		final String msg = String.format(Constants.CMD_STOR, Constants.CODE_TRANSFER_SUCC);
 		logOutput(msg);
 		return msg;
 	}
@@ -464,13 +463,13 @@ public class FtpRequest extends Thread {
 	 * directory.
 	 */
 	protected String processLIST() {
-
-		String listFile = "";
-		File[] files = workingDirectory.listFiles();
-		for (File f : files) {
-			listFile += f.getName() + "\n";
+		final StringBuilder listFiles= new StringBuilder();
+		final File[] files = workingDirectory.listFiles();
+		for (final File f : files) {
+			listFiles.append(f.getName());
+            listFiles.append("\n");
 		}
-		sendData(listFile);
+		sendData(listFiles.toString());
 
 		return processRequestBase(Constants.CODE_FILEOP_COMPLETED, "%d");
 	}
@@ -486,16 +485,19 @@ public class FtpRequest extends Thread {
 	 * Processes a PWD type request, used to display the working directory.
 	 */
 	protected String processPWD() {
-
 		final StringBuilder msg = new StringBuilder(Constants.MSG_BASE);
 		msg.append(this.workingDirectory.getAbsolutePath());
 		return processRequestBase(Constants.CODE_FILEOP_COMPLETED, msg.toString());
 	}
 
 	protected String processCWD(final String folderPath) throws IOException {
-		Path tmpPath = Paths.get(workingDirectory.getPath() + "/" + folderPath);
+        final StringBuilder path = new StringBuilder();
+        path.append(workingDirectory.getPath());
+        path.append("/");
+        path.append(folderPath);
+		final Path tmpPath = Paths.get(path.toString());
 
-		if(Files.exists(tmpPath, LinkOption.NOFOLLOW_LINKS)){
+		if (Files.exists(tmpPath, LinkOption.NOFOLLOW_LINKS)){
 			workingDirectory = new File(tmpPath.toString());
 			return processRequestBase(Constants.CODE_FILEOP_COMPLETED, "%d " + workingDirectory.getAbsolutePath());
 
@@ -512,7 +514,7 @@ public class FtpRequest extends Thread {
 		return socketData;
 	}
 
-	public void setSocketData(Socket socketData) {
+	public void setSocketData(final Socket socketData) {
 		this.socketData = socketData;
 	}
 
@@ -520,7 +522,7 @@ public class FtpRequest extends Thread {
 		return workingDirectory;
 	}
 
-	public void setWorkingDirectory(File workingDirectory) {
+	public void setWorkingDirectory(final File workingDirectory) {
 		this.workingDirectory = workingDirectory;
 	}
 
@@ -528,7 +530,7 @@ public class FtpRequest extends Thread {
 		return username;
 	}
 
-	public void setUsername(String username) {
+	public void setUsername(final String username) {
 		this.username = username;
 	}
 
@@ -536,7 +538,7 @@ public class FtpRequest extends Thread {
 		return wantToQuit;
 	}
 
-	public void setWantToQuit(boolean wantToQuit) {
+	public void setWantToQuit(final boolean wantToQuit) {
 		this.wantToQuit = wantToQuit;
 	}
 
@@ -544,7 +546,7 @@ public class FtpRequest extends Thread {
 		return authenticated;
 	}
 
-	public void setAuthenticated(boolean authenticated) {
+	public void setAuthenticated(final boolean authenticated) {
 		this.authenticated = authenticated;
 	}
 

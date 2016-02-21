@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+//import org.mockito.Mockito;
 
 
 public class TestFtpRequest {
@@ -27,15 +27,15 @@ public class TestFtpRequest {
 
 	@Test
 	public void testInitialisation(){
-		assertEquals(s.getLocalPort(), 2048);
-		assertEquals(s.getFolderPath(), System.getProperty("user.dir")); /* Intestable en dur, selon l'endroit d'où on teste */
+		assertEquals(2048, s.getLocalPort());
+		assertEquals(System.getProperty("user.dir"), s.getFolderPath()); /* Intestable en dur, selon l'endroit d'où on teste */
 	}
 
 	@Test
 	public void testUser(){
-		s.addUser("azerty", "azerty");
+		s.addUser("azerty", "qwerty");
 		assertTrue(s.users.containsKey("azerty"));
-		assertEquals(s.users.get("azerty"), "azerty");
+		assertEquals("qwerty", s.users.get("azerty"));
 
 
 		/**
@@ -52,19 +52,19 @@ public class TestFtpRequest {
 	@Test
 	public void testAuthentificationSuccess(){
 		final String USERNAME = "azerty";
-		final String PASSWORD = "azerty";
+		final String PASSWORD = "qwerty";
 		s.addUser(USERNAME, PASSWORD);
 
 		try {
 			/* Client socket */
 			Socket soc = new Socket("127.0.0.1", 2048);
 
-			FtpRequest ftp = new FtpRequest(s, soc, s.folderPath);
+			FtpRequest ftp = new FtpRequest(s, soc, s.getFolderPath());
 			String msg1 = ftp.processUSER(USERNAME);
 			String msg2 = ftp.processPASS(PASSWORD);
 
-			assertEquals(msg1, "331 Waiting for user password...");
-			assertEquals(msg2, "230 Authentication successful");
+			assertEquals("331 Waiting for user password...", msg1);
+			assertEquals("230 Authentication successful", msg2);
 			assertTrue(ftp.isAuthenticated());
 
 
@@ -77,17 +77,17 @@ public class TestFtpRequest {
 	public void testAuthentificationFailedBecauseThereIsNoUsernameProvided(){
 
 		final String USERNAME = "azerty";
-		final String PASSWORD = "azerty";
+		final String PASSWORD = "qwerty";
 		s.addUser(USERNAME, PASSWORD);
 
 		try {
 			/* Client socket */
 			Socket soc = new Socket("127.0.0.1", 2048);
 
-			FtpRequest ftp = new FtpRequest(s, soc, s.folderPath);
+			FtpRequest ftp = new FtpRequest(s, soc, s.getFolderPath());
 			String msg2 = ftp.processPASS(PASSWORD);
 
-			assertEquals(msg2, "430 No username provided");
+			assertEquals("430 No username provided", msg2);
 			assertFalse(ftp.isAuthenticated());
 
 
@@ -107,17 +107,12 @@ public class TestFtpRequest {
 			/* Client socket */
 			Socket soc = new Socket("127.0.0.1", 2048);
 
-			FtpRequest ftp = new FtpRequest(s, soc, s.folderPath);
+			FtpRequest ftp = new FtpRequest(s, soc, s.getFolderPath());
 			String msg1 = ftp.processUSER(WRONG_USERNAME);
 
-			assertEquals(msg1, "430 Authentication failed");
+			assertEquals("430 Authentication failed", msg1);
 			assertFalse(ftp.isAuthenticated());
-
-
-
-
-
-		} catch(Exception e){
+		} catch (final Exception e){
 			e.printStackTrace();
 		}
 	}
@@ -126,7 +121,7 @@ public class TestFtpRequest {
 	public void testAuthentificationFailedBecauseWrongPassword(){
 
 		final String USERNAME = "azerty";
-		final String PASSWORD = "azerty";
+		final String PASSWORD = "qwerty";
 		final String WRONG_PASSWORD = "azert";
 		s.addUser(USERNAME, PASSWORD);
 
@@ -134,54 +129,173 @@ public class TestFtpRequest {
 			/* Client socket */
 			Socket soc = new Socket("127.0.0.1", 2048);
 
-			FtpRequest ftp = new FtpRequest(s, soc, s.folderPath);
+			FtpRequest ftp = new FtpRequest(s, soc, s.getFolderPath());
 			String msg1 = ftp.processUSER(USERNAME);
 			String msg2 = ftp.processPASS(WRONG_PASSWORD);
 
-			assertEquals(msg1, "331 Waiting for user password...");
-			assertEquals(msg2, "430 Authentication failed");
+			assertEquals("331 Waiting for user password...", msg1);
+			assertEquals("430 Authentication failed", msg2);
 
 
-		} catch(Exception e){
+		} catch (final Exception e){
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	public void testSendingFile() throws UnknownHostException, IOException{
+	public void testSendingFile() throws Exception {
 
 		final String USERNAME = "azerty";
-		final String PASSWORD = "azerty";
+		final String PASSWORD = "qwerty";
 		s.addUser(USERNAME, PASSWORD);
 
-		String msg1 = null;
+		final String msg1;
 
-		try {
-			/* Client socket */
-			Socket soc = new Socket("127.0.0.1", 2048);
+        /* Client socket */
+        final Socket soc = new Socket("127.0.0.1", 2048);
 
-			FtpRequest ftp = new FtpRequest(s, soc, s.folderPath);
-			ftp.processUSER(USERNAME);
-			ftp.processPASS(PASSWORD);
-			ftp.processPORT("127,0,0,1,189,145");
+        final FtpRequest ftp = new FtpRequest(s, soc, s.getFolderPath());
+        ftp.processUSER(USERNAME);
+        ftp.processPASS(PASSWORD);
+        ftp.processPORT("127,0,0,1,189,145");
 
-			msg1 = ftp.processRETR(".classpath");
-			assertEquals(msg1, "425 Unable to complete the transfert");
-
-		} catch(Exception e){
-
-		}
-
+        msg1 = ftp.processRETR(".classpath");
+        assertEquals("425 Unable to complete the transfer", msg1);
 	}
 
 	@Test
-	public void testReceivingFile(){
+	public void testReceivingFile() throws Exception {
+		final String username = "azerty";
+		final String password = "qwerty";
+        s.addUser(username, password);
 
+        final String msg1;
+
+        final Socket socket = new Socket("127.0.0.1", 2048);
+        final FtpRequest ftp = new FtpRequest(s, socket, s.getFolderPath());
+        ftp.processUSER(username);
+        ftp.processPASS(password);
+        ftp.processPORT("127,0,0,1,189,145");
+
+        msg1 = ftp.processSTOR(".classpath");
+        assertEquals("425 Unable to complete the transfer", msg1);
 	}
 
-	@Test
-	public void testDeconnexion(){
+    @Test
+    public void testListFiles() throws Exception {
+        final String username = "azerty";
+        final String password = "qwerty";
+        s.addUser(username, password);
 
+        final String msg1;
+        final Socket socket = new Socket("127.0.0.1", 2048);
+        final FtpRequest ftp = new FtpRequest(s, socket, s.getFolderPath());
+        ftp.processUSER(username);
+        ftp.processPASS(password);
+        ftp.processPORT("127,0,0,1,189,145");
+        msg1 = ftp.processLIST();
+
+        assertEquals("250", msg1);
+    }
+
+    @Test
+    public void testChangeDirectory() throws Exception {
+        final String username = "azerty";
+        final String password = "qwerty";
+        s.addUser(username, password);
+
+        final String msg1;
+        final Socket socket = new Socket("127.0.0.1", 2048);
+        final FtpRequest ftp = new FtpRequest(s, socket, s.getFolderPath());
+        ftp.processUSER(username);
+        ftp.processPASS(password);
+        ftp.processPORT("127,0,0,1,189,145");
+        final String formerPath = ftp.getWorkingDirectory().getAbsolutePath();
+        final StringBuilder newPath = new StringBuilder();
+        newPath.append(formerPath);
+        newPath.append("/");
+        newPath.append("src");
+        msg1 = ftp.processCWD("src");
+
+        assertEquals("250 " + ftp.getWorkingDirectory().getAbsolutePath(), msg1);
+        assertEquals(newPath.toString(), ftp.getWorkingDirectory().getAbsolutePath());
+    }
+
+    @Test
+    public void testChangeDirectoryError() throws Exception {
+        final String username = "azerty";
+        final String password = "qwerty";
+        s.addUser(username, password);
+
+        final String msg1;
+        final Socket socket = new Socket("127.0.0.1", 2048);
+        final FtpRequest ftp = new FtpRequest(s, socket, s.getFolderPath());
+        ftp.processUSER(username);
+        ftp.processPASS(password);
+        ftp.processPORT("127,0,0,1,189,145");
+        final String formerPath = ftp.getWorkingDirectory().getAbsolutePath();
+        msg1 = ftp.processCWD("thegame"); // Folder that does not exist
+
+        assertEquals("530 Folder does not exist", msg1);
+        assertEquals(formerPath, ftp.getWorkingDirectory().getAbsolutePath());
+    }
+
+    @Test
+    public void testChangeToParentDirectory() throws Exception {
+        final String username = "azerty";
+        final String password = "qwerty";
+        s.addUser(username, password);
+
+        final String msg1;
+        final Socket socket = new Socket("127.0.0.1", 2048);
+        final FtpRequest ftp = new FtpRequest(s, socket, s.getFolderPath());
+        ftp.processUSER(username);
+        ftp.processPASS(password);
+        ftp.processPORT("127,0,0,1,189,145");
+        final String formerPath = ftp.getWorkingDirectory().getAbsolutePath();
+        final StringBuilder newPath = new StringBuilder();
+        newPath.append(formerPath);
+        newPath.append("/");
+        newPath.append("..");
+        msg1 = ftp.processCDUP();
+
+        assertEquals("250 " + ftp.getWorkingDirectory().getAbsolutePath(), msg1);
+        assertEquals(newPath.toString(), ftp.getWorkingDirectory().getAbsolutePath());
+    }
+
+    @Test
+    public void testPrintDirectory() throws Exception {
+        final String username = "azerty";
+        final String password = "qwerty";
+        s.addUser(username, password);
+
+        final String msg1;
+        final Socket socket = new Socket("127.0.0.1", 2048);
+        final FtpRequest ftp = new FtpRequest(s, socket, s.getFolderPath());
+        ftp.processUSER(username);
+        ftp.processPASS(password);
+        ftp.processPORT("127,0,0,1,189,145");
+        msg1 = ftp.processPWD();
+        final String path = ftp.getWorkingDirectory().getAbsolutePath();
+
+        assertEquals("250 " + path, msg1);
+    }
+
+	@Test
+	public void testDeconnexion() throws Exception {
+        final String username = "azerty";
+        final String password = "qwerty";
+        s.addUser(username, password);
+
+        final String msg1;
+        final Socket socket = new Socket("127.0.0.1", 2048);
+        final FtpRequest ftp = new FtpRequest(s, socket, s.getFolderPath());
+        ftp.processUSER(username);
+        ftp.processPASS(password);
+        ftp.processPORT("127,0,0,1,189,145");
+
+        msg1 = ftp.processQUIT();
+        assertEquals("221 Goodbye! Stay safe out there!", msg1);
 	}
 
 	@After

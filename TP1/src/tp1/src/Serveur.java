@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class Serveur extends ServerSocket{
+public class Serveur extends ServerSocket {
 
     public final Map<String, String> users = new HashMap<>();
 
-    public String folderPath;
+    private String folderPath;
 
     /**
      * Constructor for the class to represent a server
@@ -26,7 +26,7 @@ public class Serveur extends ServerSocket{
 
     }
 
-    public void addUser(String user, String password){
+    public void addUser(final String user, final String password){
         users.put(user, password);
     }
 
@@ -50,7 +50,7 @@ public class Serveur extends ServerSocket{
             socket.getInputStream();
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            final FtpRequest ftpRequest = new FtpRequest(this, socket, folderPath);
+            final FtpRequest ftpRequest = new FtpRequest(this, socket, getFolderPath());
             ftpRequest.start();
         }
     }
@@ -61,13 +61,13 @@ public class Serveur extends ServerSocket{
     
     public static void main(String [] args){
         try {
-            Serveur s = new Serveur(2048, System.getProperty("user.dir"));
+            final Serveur s = new Serveur(2048, System.getProperty("user.dir"));
             s.addUser("azerty", "azerty");
 
             s.run();
 
             s.close();
-        } catch(final Exception e){
+        } catch (final Exception e) {
             e.printStackTrace();
             System.exit(0);
         }

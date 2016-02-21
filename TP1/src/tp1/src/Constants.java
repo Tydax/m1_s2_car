@@ -46,10 +46,10 @@ public class Constants {
     public static final String MSG_INVALID_CMD = "%d Command unrecognised";
     public static final String MSG_NOT_LOGGED = "%d Not logged in";
     public static final String MSG_NO_PARAM = "%d Parameter is required, none is provided";
-    public static final String MSG_NO_SUCH_FOLDER = "%d Folder is not existing";
-    public static final String MSG_TRANSFERT_STARTED = "%d Transfert started";
-    public static final String MSG_TRANSFERT_SUCCESSFULL = "%d Transfert successfully completed";
-    public static final String MSG_TRANSFERT_UNCOMPLETED = "%d Unable to complete the transfert";
+    public static final String MSG_NO_SUCH_FOLDER = "%d Folder does not exist";
+    public static final String MSG_TRANSFER_STARTED = "%d Transfer started";
+    public static final String MSG_TRANSFER_SUCCESSFUL = "%d Transfer successfully completed";
+    public static final String MSG_TRANSFER_UNCOMPLETED = "%d Unable to complete the transfer";
 
 
 
