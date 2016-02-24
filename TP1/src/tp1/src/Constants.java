@@ -50,6 +50,7 @@ public class Constants {
     public static final String MSG_TRANSFER_STARTED = "%d Transfer started";
     public static final String MSG_TRANSFER_SUCCESSFUL = "%d Transfer successfully completed";
     public static final String MSG_TRANSFER_UNCOMPLETED = "%d Unable to complete the transfer";
+    public static final String MSG_OPERATION_FORBIDDEN = "%d Unable to move through the asked directory. Forbidden";
 
 
 

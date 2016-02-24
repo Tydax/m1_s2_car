@@ -496,8 +496,13 @@ public class FtpRequest extends Thread {
         path.append("/");
         path.append(folderPath);
 		final Path tmpPath = Paths.get(path.toString());
-
-		if (Files.exists(tmpPath, LinkOption.NOFOLLOW_LINKS)){
+		
+		Path absolutePath = Paths.get(workingDirectory.getPath()).toAbsolutePath();
+		Path limitPath = Paths.get(System.getProperty("user.home"));
+		
+		if(absolutePath.equals(limitPath) && folderPath.equals("..")){
+			return processRequestBase(Constants.CODE_REQUEST_NO_EXECUTED, Constants.MSG_OPERATION_FORBIDDEN);
+		} else if (Files.exists(tmpPath, LinkOption.NOFOLLOW_LINKS)){
 			workingDirectory = new File(tmpPath.toString());
 			return processRequestBase(Constants.CODE_FILEOP_COMPLETED, "%d " + workingDirectory.getAbsolutePath());
 

@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +62,7 @@ public class Serveur extends ServerSocket {
     }
     
     public static void main(String [] args){
-        try {
+        try {    		
             final Serveur s = new Serveur(2048, System.getProperty("user.dir"));
             s.addUser("azerty", "azerty");
 
