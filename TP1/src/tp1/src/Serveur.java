@@ -64,7 +64,7 @@ public class Serveur extends ServerSocket {
     public static void main(String [] args){
         try {    		
             final Serveur s = new Serveur(2048, System.getProperty("user.dir"));
-            s.addUser("azerty", "azerty");
+            s.addUser("azerty", "qwerty");
 
             s.run();
 
