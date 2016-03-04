@@ -105,7 +105,10 @@ public class FtpRequest extends Thread {
 		String request;
 		boolean keepOpen = true;
 		while (keepOpen) {
+		    System.out.println("Hello");
+		    System.out.println(this.input.read());
 			request = this.input.readLine();
+			System.out.println("Toto");
 			keepOpen = processRequest(request);
 		}
 
@@ -113,6 +116,8 @@ public class FtpRequest extends Thread {
 	}
 
 	public boolean processRequest(String request) throws IOException{
+	    
+	    System.out.println("Request : " + request);
 		boolean keepOpen = true;
 
 		int ind = request.indexOf(" ");

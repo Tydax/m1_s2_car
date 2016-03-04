@@ -21,8 +21,14 @@ public class TP2Resource {
     @Produces("application/octet-stream")
     @Path("/{path}")
     public File get(@PathParam("path") String path ) {
-        File file = new File(path);
+        PasserelleServer ps = new PasserelleServer(Constants.host, Constants.port, Constants.username, Constants.password);
         
+        File file = null;
+        try {
+            file = ps.retrieve(path);
+        } catch(Exception e){
+            e.printStackTrace();
+        }
         return file;
     }
 }
