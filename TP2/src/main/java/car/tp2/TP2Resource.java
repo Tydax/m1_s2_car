@@ -10,7 +10,7 @@ import javax.ws.rs.Produces;
 /**
  * Exemple de ressource REST accessible a l'adresse :
  * 
- *      http://localhost:8080/rest/tp2/helloworld
+ *      http://localhost:8080/rest/tp2/commandes
  * 
  * @author Lionel Seinturier <Lionel.Seinturier@univ-lille1.fr>
  */
