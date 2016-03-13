@@ -1,0 +1,7 @@
+#Master 1 : Semestre 6
+##Construction d'applications réparties
+###Practical no. 1
+This first practical consists in implementing a FTP server using TCP port.
+
+Tout dans le TP fonctionne.
+Le meilleur moyen de tester le TP est de le faire avec la commande ftp. Celle-ci fait quelques choses en plus par rapport à une commande telnet comme envoyer des commandes PORT qui indiquent sur quel port il faut renvoyer la réponse de la commande suivante.
