@@ -98,14 +98,13 @@ public class FTPRequestParser
 		{
 			ftp_req.setType(FTPRequestType.FTP_SYST_REQ);
 		}
-		else if(arg[0].equals("NLST"))
-		{
-			ftp_req.setType(FTPRequestType.FTP_NLST_REQ);
-		}
-		
 		else if(arg[0].equals("PASV"))
 		{
 			ftp_req.setType(FTPRequestType.FTP_PASV_REQ);
+		}
+		else if(arg[0].equals("DELE"))
+		{
+			ftp_req.setType(FTPRequestType.FTP_DELE_REQ);
 		}
 		else
 		{

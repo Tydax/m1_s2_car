@@ -8,6 +8,10 @@ import java.net.ConnectException;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPFileEntryParser;
+import org.apache.commons.net.ftp.parser.DefaultFTPFileEntryParserFactory;
+import org.apache.commons.net.ftp.parser.FTPFileEntryParserFactory;
+import org.apache.commons.net.ftp.parser.ParserInitializationException;
 
 public class PasserelleServer {
 
@@ -24,6 +28,7 @@ public class PasserelleServer {
 		this.password = password;
 
 		FTPClientConfig conf = new FTPClientConfig(FTPClientConfig.SYST_UNIX);
+		conf.setServerLanguageCode(FTPClientConfig.SYST_UNIX);
 
 		client = new FTPClient();
 		client.configure(conf);
@@ -71,28 +76,24 @@ public class PasserelleServer {
 		return file;
 	}
 
-	public String[] listFiles(){
-		String[] filenames = null;
+	public FTPFile[] listFiles(String folder_path){
 		FTPFile[] ftpFiles = null;
 		try {
 			authenticate();
 			if(!isAuthenticated()){
 				return null;
 			}
-			ftpFiles = client.listFiles();
-			filenames = new String[ftpFiles.length];
-			System.out.println("Length : " + ftpFiles.length);
-
-			for(int i=0;i<ftpFiles.length;i++){
-				filenames[i] = ftpFiles[i].getName();
-			}
-
+			if(folder_path != null)
+				ftpFiles = client.listFiles(folder_path);
+			else
+				ftpFiles = client.listFiles();
+			
 			client.disconnect();
 		} catch(Exception e){
 			System.err.println("Error from here");
 			e.printStackTrace();
 		}
-		return filenames;
+		return ftpFiles;
 	}
 
 
@@ -110,16 +111,14 @@ public class PasserelleServer {
 			e.printStackTrace();
 		}
 		return "";
-
 	}
 
 
-	public String storeFile(InputStream is, String path){
-
+	public void storeFile(InputStream is, String path){
 		try {
 			authenticate();
 			if(!isAuthenticated()){
-				return null;
+				return;
 			}
 
 			client.storeFile(path, is);
@@ -127,7 +126,22 @@ public class PasserelleServer {
 			System.err.println("Error from here");
 			e.printStackTrace();
 		}
-		return "";
+
+	}
+	
+	
+	public void deleteFile(String filepath){
+		try {
+			authenticate();
+			if(!isAuthenticated()){
+				return;
+			}
+
+			client.deleteFile(filepath);
+		} catch(Exception e){
+			System.err.println("Error from here <egwrxh");
+			e.printStackTrace();
+		}
 
 	}
 }

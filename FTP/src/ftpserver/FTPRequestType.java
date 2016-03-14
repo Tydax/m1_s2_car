@@ -18,5 +18,6 @@ public enum FTPRequestType
 	FTP_PORT_REQ,
 	FTP_MKD_REQ,
 	FTP_NLST_REQ,
-	FTP_PASV_REQ
+	FTP_PASV_REQ,
+	FTP_DELE_REQ
 }
