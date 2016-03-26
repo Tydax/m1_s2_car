@@ -4,10 +4,14 @@ import java.io.Serializable;
 
 public class GreetingMessage implements Serializable{
 
-    String who;
+    String text;
     
-    public GreetingMessage(String who){
-        this.who = who;
+    public GreetingMessage(String text){
+    	this.text = text;
+    }
+    
+    public String getText(){
+    	return this.text;
     }
     
     
