@@ -2,6 +2,7 @@ package main;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import message.GreetingMessage;
 import actors.Actors;
@@ -91,9 +92,31 @@ public class Starter {
         
         /* Envoi de messages */
         
-        GreetingMessage greeting = new GreetingMessage("Charlie Parker");
+        String actor = null, message = null;
+        Scanner scanner = new Scanner(System.in);
         
-        greeter1.tell(greeting, ActorRef.noSender()); 
+        while(actor != "" && message != ""){
+        	actor = "";
+        	message = "";
+        	while(actor == null || Actors.getActor(actor) == null){
+        		System.out.print("Donnez le nom d'un acteur à qui envoyer un message : ");
+        		actor = scanner.next();
+        		
+        	}
+        	
+        	while(message == null || message == ""){
+        		System.out.print("Donnez le nom d'un message à envoyer : ");
+        		message = scanner.next();
+        		
+        	}
+        	Actors.getActor(actor).tell(new GreetingMessage(message), ActorRef.noSender());
+        	
+        }
+        
+       
+        
+        
+        // greeter1.tell(greeting, ActorRef.noSender()); 
         
         //greeter2.tell(new GreetingMessage("Bob Marley"), ActorRef.noSender()); 
         

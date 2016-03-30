@@ -33,7 +33,7 @@ public class GreetingActor extends UntypedActor{
     	}
     	
     	messagesReceived.add(message);
-        
+
         if(message instanceof GreetingMessage){
         	GreetingMessage greetingMessage = (GreetingMessage)message;
         	System.out.println("[" + nodeName + "] receive from (" + getSender().toString() + ") the following message : " + greetingMessage.getText());
