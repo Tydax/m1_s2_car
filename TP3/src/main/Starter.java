@@ -51,7 +51,7 @@ public class Starter {
         /* Node 3 */
         neighbours = new ArrayList<String>();
         neighbours.add(nodeName2);
-        argsConstructors[0] = (Object)nodeName3;
+        argsConstructors[0] = (Object)nodeName3;    
         argsConstructors[1] = (Object)neighbours;
         greeter3 = system1.actorOf(Props.create(GreetingActor.class, argsConstructors), nodeName3);
         
