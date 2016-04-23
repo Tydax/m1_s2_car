@@ -34,9 +34,10 @@ public class BookBean {
 		this.title = title;
 		this.year = year;
 	}
-	
+
 	/**
 	 * Gets the generated id of the book.
+	 * 
 	 * @return
 	 */
 	public int getID() {
@@ -45,6 +46,7 @@ public class BookBean {
 
 	/**
 	 * Gets the author of the book.
+	 * 
 	 * @return the author.
 	 */
 	public String getAuthor() {
@@ -53,6 +55,7 @@ public class BookBean {
 
 	/**
 	 * Gets the title of the book.
+	 * 
 	 * @return the title.
 	 */
 	public String getTitle() {
@@ -61,6 +64,7 @@ public class BookBean {
 
 	/**
 	 * Gets the year of publication of the book.
+	 * 
 	 * @return the year of publication.
 	 */
 	public int getYear() {
@@ -69,6 +73,7 @@ public class BookBean {
 
 	/**
 	 * Sets the author of the book.
+	 * 
 	 * @param author
 	 */
 	public void setAuthor(final String author) {
@@ -77,6 +82,7 @@ public class BookBean {
 
 	/**
 	 * Sets the title of the book.
+	 * 
 	 * @param title
 	 */
 	public void setTitle(final String title) {
@@ -85,6 +91,7 @@ public class BookBean {
 
 	/**
 	 * Sets the year of publication of the book.
+	 * 
 	 * @param year
 	 */
 	public void setYear(final int year) {
