@@ -1,4 +1,4 @@
-package main.java.car.tp4.bean;
+package car.tp4.bean;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,7 +9,7 @@ import javax.persistence.Id;
  * BookBean stores the information concerning a book.
  */
 @Entity
-public class BookBean {
+public class Book {
 
 	/** The id of the book. */
 	@Id
@@ -25,11 +25,11 @@ public class BookBean {
 	/**
 	 * Constructor generating a random id.
 	 */
-	public BookBean() {
+	public Book() {
 		this("", "", 0);
 	}
 
-	public BookBean(final String author, final String title, final int year) {
+	public Book(final String author, final String title, final int year) {
 		this.author = author;
 		this.title = title;
 		this.year = year;
@@ -96,5 +96,16 @@ public class BookBean {
 	 */
 	public void setYear(final int year) {
 		this.year = year;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		final String format = "“%s”, %s, %d";
+		return String.format(format, this.title, this.author, this.year);
 	}
 }

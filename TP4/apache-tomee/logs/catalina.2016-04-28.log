@@ -1,0 +1,66 @@
+Apr 28, 2016 12:00:29 AM org.apache.catalina.core.StandardContext reload
+INFO: Reloading Context with name [] has started
+Apr 28, 2016 12:00:29 AM org.apache.openejb.assembler.classic.Assembler destroyApplication
+INFO: Undeploying app: /Users/tydax/Development/Java/master_1/m1_s2_car/TP4/apache-tomee/webapps/ROOT
+Apr 28, 2016 12:00:29 AM org.apache.openejb.config.ConfigurationFactory configureApplication
+INFO: Configuring enterprise application: /Users/tydax/Development/Java/master_1/m1_s2_car/TP4/apache-tomee/webapps/ROOT
+Apr 28, 2016 12:00:29 AM org.apache.openejb.config.InitEjbDeployments deploy
+INFO: Auto-deploying ejb LibraryService: EjbDeployment(deployment-id=LibraryService)
+Apr 28, 2016 12:00:29 AM org.apache.openejb.config.AutoConfig deploy
+INFO: Configuring PersistenceUnit(name=book-pu)
+Apr 28, 2016 12:00:29 AM org.apache.openejb.config.AutoConfig setJtaDataSource
+INFO: Adjusting PersistenceUnit book-pu <jta-data-source> to Resource ID 'Default JDBC Database' from 'bookDatabase'
+Apr 28, 2016 12:00:29 AM org.apache.openejb.config.AutoConfig setNonJtaDataSource
+INFO: Adjusting PersistenceUnit book-pu <non-jta-data-source> to Resource ID 'Default Unmanaged JDBC Database' from 'null'
+Apr 28, 2016 12:00:29 AM org.apache.openejb.config.AppInfoBuilder build
+INFO: Enterprise application "/Users/tydax/Development/Java/master_1/m1_s2_car/TP4/apache-tomee/webapps/ROOT" loaded.
+Apr 28, 2016 12:00:29 AM org.apache.openejb.assembler.classic.Assembler createApplication
+INFO: Assembling app: /Users/tydax/Development/Java/master_1/m1_s2_car/TP4/apache-tomee/webapps/ROOT
+Apr 28, 2016 12:00:29 AM null
+INFO: OpenJPA dynamically loaded a validation provider.
+Apr 28, 2016 12:00:29 AM org.apache.openejb.assembler.classic.ReloadableEntityManagerFactory createDelegate
+INFO: PersistenceUnit(name=book-pu, provider=org.apache.openjpa.persistence.PersistenceProviderImpl) - provider time 12ms
+Apr 28, 2016 12:00:29 AM org.apache.openejb.assembler.classic.JndiBuilder bind
+INFO: Jndi(name=LibraryServiceLocal) --> Ejb(deployment-id=LibraryService)
+Apr 28, 2016 12:00:29 AM org.apache.openejb.assembler.classic.JndiBuilder bind
+INFO: Jndi(name=global//LibraryService!car.tp4.service.ILibrary) --> Ejb(deployment-id=LibraryService)
+Apr 28, 2016 12:00:29 AM org.apache.openejb.assembler.classic.JndiBuilder bind
+INFO: Jndi(name=global//LibraryService) --> Ejb(deployment-id=LibraryService)
+Apr 28, 2016 12:00:29 AM org.apache.openejb.cdi.CdiBuilder initSingleton
+INFO: Existing thread singleton service in SystemInstance(): org.apache.openejb.cdi.ThreadSingletonServiceImpl@1e4a7dd4
+Apr 28, 2016 12:00:29 AM org.apache.openejb.cdi.OpenEJBLifecycle startApplication
+INFO: OpenWebBeans Container is starting...
+Apr 28, 2016 12:00:29 AM org.apache.openejb.cdi.OpenEJBLifecycle startApplication
+INFO: OpenWebBeans Container has started, it took 7 ms.
+Apr 28, 2016 12:00:29 AM org.apache.openejb.assembler.classic.Assembler startEjbs
+INFO: Created Ejb(deployment-id=LibraryService, ejb-name=LibraryService, container=Default Stateless Container)
+Apr 28, 2016 12:00:29 AM org.apache.openejb.assembler.classic.Assembler startEjbs
+INFO: Started Ejb(deployment-id=LibraryService, ejb-name=LibraryService, container=Default Stateless Container)
+Apr 28, 2016 12:00:29 AM org.apache.openejb.assembler.classic.Assembler createApplication
+INFO: Deployed Application(path=/Users/tydax/Development/Java/master_1/m1_s2_car/TP4/apache-tomee/webapps/ROOT)
+Apr 28, 2016 12:00:29 AM org.apache.catalina.core.StandardContext reload
+INFO: Reloading Context with name [] is completed
+Apr 28, 2016 12:00:46 AM org.apache.coyote.AbstractProtocol pause
+INFO: Pausing ProtocolHandler ["http-bio-8080"]
+Apr 28, 2016 12:00:46 AM org.apache.coyote.AbstractProtocol pause
+INFO: Pausing ProtocolHandler ["ajp-bio-8009"]
+Apr 28, 2016 12:00:46 AM org.apache.catalina.core.StandardService stopInternal
+INFO: Stopping service Catalina
+Apr 28, 2016 12:00:46 AM org.apache.openejb.assembler.classic.Assembler destroyApplication
+INFO: Undeploying app: /Users/tydax/Development/Java/master_1/m1_s2_car/TP4/apache-tomee/webapps/ROOT
+Apr 28, 2016 12:00:47 AM org.apache.coyote.AbstractProtocol stop
+INFO: Stopping ProtocolHandler ["http-bio-8080"]
+Apr 28, 2016 12:00:47 AM org.apache.coyote.AbstractProtocol stop
+INFO: Stopping ProtocolHandler ["ajp-bio-8009"]
+Apr 28, 2016 12:00:47 AM org.apache.openejb.server.SimpleServiceManager stop
+INFO: Stopping server services
+Apr 28, 2016 12:00:47 AM org.apache.openejb.assembler.classic.Assembler destroyApplication
+INFO: Undeploying app: openejb
+Apr 28, 2016 12:00:47 AM org.apache.openejb.assembler.classic.Assembler destroyResource
+INFO: Closing DataSource: Default JDBC Database
+Apr 28, 2016 12:00:47 AM org.apache.openejb.assembler.classic.Assembler destroyResource
+INFO: Closing DataSource: Default Unmanaged JDBC Database
+Apr 28, 2016 12:00:47 AM org.apache.coyote.AbstractProtocol destroy
+INFO: Destroying ProtocolHandler ["http-bio-8080"]
+Apr 28, 2016 12:00:47 AM org.apache.coyote.AbstractProtocol destroy
+INFO: Destroying ProtocolHandler ["ajp-bio-8009"]
