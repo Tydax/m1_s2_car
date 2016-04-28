@@ -35,6 +35,7 @@
 		}
 	%>
 	<div id="body">
+		<h1>Ajouter un livre à la bibliothèque</h1>
 		<form action="/add_book" method="POST">
 			<table>
 				<tr>

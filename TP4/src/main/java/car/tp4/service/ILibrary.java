@@ -35,4 +35,13 @@ public interface ILibrary {
 	 * @return The list of books registered.
 	 */
 	List<Book> getListOfBooks();
+
+	/**
+	 * Gets the book associated with the specified id.
+	 * 
+	 * @param id
+	 *            The id of the book
+	 * @return The book associated with this id.
+	 */
+	Book getBookByID(final int id);
 }

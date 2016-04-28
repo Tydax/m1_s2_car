@@ -1,3 +1,4 @@
+<%@page import="java.util.Map"%>
 <%@page import="car.tp4.servlet.basket.BasketServlet"%>
 <%@page import="car.tp4.bean.Book"%>
 <%@page import="java.util.List"%>
@@ -12,18 +13,18 @@
 </head>
 <body>
 	<div id="body">
-		<h1>Liste des livres de la bibliothèque</h1>
+		<h1>Contenu du panier</h1>
 		<%
-			final List<Book> listBooks = (List<Book>) request.getAttribute(GetListBooksServlet.ATTR_LIST_BOOKS);
-			if (listBooks == null) { %>
+			final Map<Book, Integer> basket = (Map<Book, Integer>) request.getAttribute(BasketServlet.ATTR_BASKET_CONTENT);
+			if (basket == null) { %>
 			
 			<div>
-				<p>Erreur lors de la récupération des livres.</p>
+				<p>Erreur lors de la récupération du contenu du panier.</p>
 			</div>
 		<%		
-			} else if (listBooks.isEmpty()) {
+			} else if (basket.isEmpty()) {
 		%>
-				<p>Aucun livre disponible.</p>
+				<p>Le panier est vide.</p>
 		<%
 			} else {
 		%>
@@ -32,15 +33,18 @@
 					<th>Titre</th>
 					<th>Auteur</th>
 					<th>Date de publication</th>
+					<th>Quantité</th>
 				</tr>
 				<%
-				for (final Book book : listBooks) {
+				for (final Book book : basket.keySet()) {
 				%>
 					<tr>
 						<td><%= book.getTitle() %></td>
 						<td><%= book.getAuthor() %></td>
 						<td><%= book.getYear() %></td>
-						<td><a class="butt" href="/add_basket?<%= BasketServlet.PARAM_BASKET_ID %>=<%= book.getID() %>">J’en veux un !</a></td>
+						<td><%= basket.get(book) %></td>
+						<td><a class="butt" href="/add_basket?<%= BasketServlet.PARAM_BASKET_ID %>=<%= book.getID() %>">J’en veux plus !</a></td>
+						<td><a class="butt" href="/remove_basket?<%= BasketServlet.PARAM_BASKET_ID %>=<%= book.getID() %>">J’en veux moins !</a></td>
 					</tr>					
 				<%
 				}

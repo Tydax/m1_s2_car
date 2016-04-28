@@ -61,4 +61,23 @@ public class LibraryService implements ILibrary {
 	public List<Book> getListOfBooks() {
 		return new ArrayList<Book>(this.library);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see car.tp4.service.ILibrary#getBookByID(int)
+	 */
+	@Override
+	public Book getBookByID(int id) {
+		Book book = null;
+
+		for (final Book b : this.library) {
+			if (b.getID() == id) {
+				book = b;
+				break;
+			}
+		}
+
+		return book;
+	}
 }
