@@ -61,5 +61,4 @@ public class LibraryService implements ILibrary {
 	public List<Book> getListOfBooks() {
 		return new ArrayList<Book>(this.library);
 	}
-
 }

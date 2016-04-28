@@ -18,6 +18,10 @@ import car.tp4.service.ILibrary;
 )
 public class AddBookServlet extends HttpServlet {
 
+
+	private static final String URL_FORM = "/add_book_form.jsp";
+	private static final String URL_SUCCESS = "/fetch_books";
+
 	private static final long serialVersionUID = -4017177679459672051L;
 
 	/** Parameter key for author. */
@@ -31,7 +35,7 @@ public class AddBookServlet extends HttpServlet {
 	
 	private static final String MSG_EMPTY_INPUT = "Un champ est vide.";
 	private static final String MSG_NUMBER_FORMAT = "L’année n’est pas un nombre.";
-	private static final String DEBUG_MSG = "[DEBUG][AddBookServlet] Added book '%' to library.";
+	private static final String DEBUG_MSG = "[DEBUG][AddBookServlet] Added book '%s' to library.";
 	
 	@EJB(name = "LibraryService")
 	private ILibrary library;
@@ -49,10 +53,15 @@ public class AddBookServlet extends HttpServlet {
 		final String param_title = request.getParameter(PARAM_BOOK_TITLE);
 		final String param_year = request.getParameter(PARAM_BOOK_YEAR);
 		
+		if (param_author == null || param_title == null || param_year == null) {
+			getServletContext().getRequestDispatcher(URL_FORM).forward(request, resp);
+			return;
+		}
+		
 		// Checking that form input is not empty 
 		if (param_author.isEmpty() || param_title.isEmpty() || param_year.isEmpty()) {
 			request.setAttribute(ATTR_ERROR, MSG_EMPTY_INPUT);
-			getServletContext().getRequestDispatcher("/add_book_form.jsp").forward(request, resp);
+			getServletContext().getRequestDispatcher(URL_FORM).forward(request, resp);
 			return;
 		}
 		
@@ -62,7 +71,7 @@ public class AddBookServlet extends HttpServlet {
 			year = Integer.parseInt(param_year);
 		} catch (final NumberFormatException exc) {
 			request.setAttribute(ATTR_ERROR, MSG_NUMBER_FORMAT);
-			getServletContext().getRequestDispatcher("/add_book_form.jsp").forward(request, resp);
+			getServletContext().getRequestDispatcher(URL_FORM).forward(request, resp);
 			return;
 		}
 		
@@ -71,6 +80,6 @@ public class AddBookServlet extends HttpServlet {
 		this.library.addBook(book);
 		System.out.println(String.format(DEBUG_MSG, book));
 		
-		getServletContext().getRequestDispatcher("/index.jsp").forward(request, resp);
+		getServletContext().getRequestDispatcher(URL_SUCCESS).forward(request, resp);
 	}
 }

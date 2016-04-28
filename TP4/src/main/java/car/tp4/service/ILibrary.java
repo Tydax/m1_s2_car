@@ -20,15 +20,18 @@ public interface ILibrary {
 	 * @return a list containing all the authors.
 	 */
 	List<String> getListOfAuthors();
-	
+
 	/**
 	 * Adds a book to the library.
-	 * @param book The book to add.
+	 * 
+	 * @param book
+	 *            The book to add.
 	 */
 	void addBook(final Book book);
-	
+
 	/**
 	 * Gets the list of books registered in the library.
+	 * 
 	 * @return The list of books registered.
 	 */
 	List<Book> getListOfBooks();

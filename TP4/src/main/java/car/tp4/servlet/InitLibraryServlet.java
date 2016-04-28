@@ -34,7 +34,7 @@ public class InitLibraryServlet extends HttpServlet {
 	 * HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	protected void service(final HttpServletRequest req, final HttpServletResponse resp)
+	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
 			throws ServletException, IOException {
 		library.initBaseBooks();
 		System.out.println(DEBUG_MSG);
