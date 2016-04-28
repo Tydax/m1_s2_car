@@ -1,4 +1,4 @@
-package car.tp4.servlet.basket;
+package car.tp4.servlet;
 
 import java.io.IOException;
 import java.util.Map;
@@ -13,9 +13,17 @@ import javax.servlet.http.HttpServletResponse;
 import car.tp4.bean.Book;
 import car.tp4.service.IBasket;
 
-@WebServlet(name = "BasketServlet", urlPatterns = { "/add_basket", "/remove_basket", "/list_basket" })
+@WebServlet(
+	name = "BasketServlet",
+	urlPatterns = {
+		BasketServlet.URL_LIST,
+		BasketServlet.URL_EMPTY,
+		BasketServlet.URL_REMOVE,
+		BasketServlet.URL_ADD,
+		BasketServlet.URL_VALID
+	}
+)
 public class BasketServlet extends HttpServlet {
-
 
 	private static final long serialVersionUID = -4515170226417744394L;
 
@@ -24,9 +32,11 @@ public class BasketServlet extends HttpServlet {
 	/** Attribute key for basket content. */
 	public static final String ATTR_BASKET_CONTENT = "attr_basket_content";
 
-	private static final String URL_LIST = "/list_basket";
-	private static final String URL_REMOVE = "/remove_basket";
-	private static final String URL_ADD = "/add_basket";
+	public static final String URL_LIST = "/list_basket";
+	public static final String URL_EMPTY = "/empty_basket";
+	public static final String URL_REMOVE = "/remove_basket";
+	public static final String URL_ADD = "/add_basket";
+	public static final String URL_VALID = "/valid_basket";
 
 	private static final String URL_REDIRECT = "/fetch_books";
 	private static final String URL_LIST_JSP = "/list_basket.jsp";
@@ -70,18 +80,29 @@ public class BasketServlet extends HttpServlet {
 			
 			// Adding or removing?
 			if (URL_ADD.equals(path)) {
-				this.basket.addToBasket(id);
+				this.basket.add(id);
 			} else {
-				this.basket.removeFromBasket(id);
+				this.basket.remove(id);
 				redirect(URL_LIST, request, resp);
 			}
-		} else if (URL_LIST.equals(path)) { // Listing basket
-			final Map<Book, Integer> basketContent = this.basket.getBasketContent();
+		} else if (URL_LIST.equals(path) || URL_VALID.equals(path)) { // Listing basket or validating basket
+			final Map<Book, Integer> basketContent = this.basket.getContent();
 			request.setAttribute(ATTR_BASKET_CONTENT, basketContent);
-			redirect(URL_LIST_JSP, request, resp);
-			return;
+			
+			// Validating basket
+			if (URL_VALID.equals(path) && basketContent != null && !basketContent.isEmpty()) {
+				this.basket.empty();
+				redirect(OrdersServlet.URL_ADD, request, resp);
+				return;
+			} else { // Basket is empty or just fetching the basket content
+				redirect(URL_LIST_JSP, request, resp);
+				return;
+			}
+			
+		} else if (URL_EMPTY.contentEquals(path)) {
+			this.basket.empty();
+			redirect(URL_LIST, request, resp);
 		}
-
 		redirect(URL_REDIRECT, request, resp);
 	}
 }

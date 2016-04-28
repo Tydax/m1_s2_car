@@ -13,7 +13,7 @@ public class BasketService implements IBasket {
 
 	@EJB(name = "LibraryService")
 	private ILibrary library;
-	
+
 	/** The basket containing the book associated with a quantity. */
 	private final Map<Book, Integer> basket = new HashMap<Book, Integer>();
 
@@ -23,13 +23,11 @@ public class BasketService implements IBasket {
 	 * @see car.tp4.service.IBasket#addToBasket(car.tp4.bean.Book)
 	 */
 	@Override
-	public void addToBasket(int id) {
+	public void add(final int id) {
 		final Book book = this.library.getBookByID(id);
-		
+
 		if (book != null) {
-			final int qty = this.basket.get(book) != null
-						  ? this.basket.get(book)
-						  : 0;
+			final int qty = this.basket.get(book) != null ? this.basket.get(book) : 0;
 			this.basket.put(book, qty + 1);
 		}
 	}
@@ -40,14 +38,18 @@ public class BasketService implements IBasket {
 	 * @see car.tp4.service.IBasket#removeFromBasket(car.tp4.bean.Book)
 	 */
 	@Override
-	public void removeFromBasket(final int id) {
+	public void remove(final int id) {
 		final Book book = this.library.getBookByID(id);
-		
+
 		if (book != null) {
 			final Integer qty = this.basket.get(book);
 			if (qty != null) {
-				this.basket.put(book, qty - 1);
-				this.basket.remove(id, 0); // Remove only if equals 0;
+				// Remove if no quantity is left
+				if (qty == 1) {
+					this.basket.remove(book);
+				} else {
+					this.basket.put(book, qty - 1);
+				}
 			}
 		}
 	}
@@ -58,7 +60,7 @@ public class BasketService implements IBasket {
 	 * @see car.tp4.service.IBasket#validateBasket()
 	 */
 	@Override
-	public void validateBasket() {
+	public void validate() {
 		// TODO
 	}
 
@@ -68,8 +70,18 @@ public class BasketService implements IBasket {
 	 * @see car.tp4.service.IBasket#getBasketContent()
 	 */
 	@Override
-	public Map<Book, Integer> getBasketContent() {
+	public Map<Book, Integer> getContent() {
 		return new HashMap<Book, Integer>(this.basket);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see car.tp4.service.IBasket#emptyBasket()
+	 */
+	@Override
+	public void empty() {
+		this.basket.clear();
 	}
 
 }

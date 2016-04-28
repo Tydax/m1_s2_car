@@ -1,4 +1,6 @@
 <%@page import="car.tp4.servlet.BasketServlet"%>
+<%@page import="car.tp4.bean.Order"%>
+<%@page import="car.tp4.servlet.OrdersServlet"%>
 <%@page import="car.tp4.bean.Book"%>
 <%@page import="java.util.List"%>
 <%@page import="car.tp4.servlet.GetListBooksServlet"%>
@@ -8,7 +10,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>BookCity — Liste des livres</title>
+<title>BookCity — Liste des commandes</title>
 <link href="style.css" rel="stylesheet" type="text/css" >
 </head>
 <body>
@@ -22,35 +24,42 @@
 	</nav>
 
 	<div id="body">
-		<h1>Liste des livres de la bibliothèque</h1>
+		<h1>Liste des commandes</h1>
 		<%
-			final List<Book> listBooks = (List<Book>) request.getAttribute(GetListBooksServlet.ATTR_LIST_BOOKS);
-			if (listBooks == null) { %>
+			final List<Order> listOrders = (List<Order>) request.getAttribute(OrdersServlet.ATTR_LIST_ORDERS);
+			if (listOrders == null) { %>
 			
 			<div>
-				<p>Erreur lors de la récupération des livres.</p>
+				<p>Erreur lors de la récupération des commandes.</p>
 			</div>
 		<%		
-			} else if (listBooks.isEmpty()) {
+			} else if (listOrders.isEmpty()) {
 		%>
-				<p>Aucun livre disponible.</p>
+				<p>Aucune commande enregistrée.</p>
 		<%
 			} else {
 		%>
 			<table>
 				<tr>
-					<th>Titre</th>
-					<th>Auteur</th>
-					<th>Date de publication</th>
+					<th>ID</th>
+					<th>Contenu</th>
 				</tr>
 				<%
-				for (final Book book : listBooks) {
+				for (final Order order : listOrders) {
 				%>
 					<tr>
-						<td><%= book.getTitle() %></td>
-						<td><%= book.getAuthor() %></td>
-						<td><%= book.getYear() %></td>
-						<td><a class="butt" href="/add_basket?<%= BasketServlet.PARAM_BASKET_ID %>=<%= book.getID() %>">J’en veux un !</a></td>
+						<td><%= order.getId() %></td>
+						<td>
+							<ul>
+								<%
+								for (final Book book : order.getContent().keySet()) {
+								%>
+									<li>“<%= book.getTitle() %>” (<%= book.getYear() %>) de <%= book.getAuthor() %> x <%= order.getContent().get(book) %></li>
+								<%
+								}
+								%>
+							</ul>
+						</td>
 					</tr>					
 				<%
 				}

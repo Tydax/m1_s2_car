@@ -1,8 +1,6 @@
 package car.tp4.bean;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -11,16 +9,18 @@ import javax.persistence.Id;
 @Entity
 public class Book {
 
+	protected static int generated_id = 0;
+
 	/** The id of the book. */
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	// @GeneratedValue(strategy = GenerationType.AUTO)
+	protected int id;
 	/** The author of the book. */
-	private String author;
+	protected String author;
 	/** The title of the book. */
-	private String title;
+	protected String title;
 	/** The year of publication of the book. */
-	private int year;
+	protected int year;
 
 	/**
 	 * Constructor generating a random id.
@@ -29,6 +29,7 @@ public class Book {
 	}
 
 	public Book(final String author, final String title, final int year) {
+		this.id = generated_id++;
 		this.author = author;
 		this.title = title;
 		this.year = year;

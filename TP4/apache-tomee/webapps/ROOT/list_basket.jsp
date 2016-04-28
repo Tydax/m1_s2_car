@@ -1,5 +1,6 @@
+<%@page import="car.tp4.servlet.BasketServlet"%>
 <%@page import="java.util.Map"%>
-<%@page import="car.tp4.servlet.basket.BasketServlet"%>
+<%@page import="car.tp4.servlet.BasketServlet"%>
 <%@page import="car.tp4.bean.Book"%>
 <%@page import="java.util.List"%>
 <%@page import="car.tp4.servlet.GetListBooksServlet"%>
@@ -9,9 +10,19 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>BookCity — Liste des livres</title>
+<title>BookCity — Panier</title>
+<link href="style.css" rel="stylesheet" type="text/css" >
 </head>
 <body>
+	<nav>
+		<ul id="menu">
+			<li><a href="/fetch_books">Liste des livres</a></li>
+			<li><a href="/add_book">Ajouter un livre</a></li>
+			<li><a href="/list_basket">Panier</a></li>
+			<li><a href="/fetch_orders">Liste des commandes</a></li>
+		</ul>
+	</nav>
+	
 	<div id="body">
 		<h1>Contenu du panier</h1>
 		<%
@@ -53,6 +64,9 @@
 		<%
 			}
 		%>
+		
+		<a class="butt" href="/valid_basket">Valider le panier</a>
+		<a class="butt" href="/empty_basket">Vider le panier</a>
 	</div>
 </body>
 </html>

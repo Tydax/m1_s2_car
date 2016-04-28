@@ -6,6 +6,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>BookCity — Saisir un nouveau livre</title>
+<link href="style.css" rel="stylesheet" type="text/css" >
 </head>
 <body>
 	<%
@@ -34,6 +35,14 @@
 	<%
 		}
 	%>
+	<nav>
+		<ul id="menu">
+			<li><a href="/fetch_books">Liste des livres</a></li>
+			<li><a href="/add_book">Ajouter un livre</a></li>
+			<li><a href="/list_basket">Panier</a></li>
+			<li><a href="/fetch_orders">Liste des commandes</a></li>
+		</ul>
+	</nav>
 	<div id="body">
 		<h1>Ajouter un livre à la bibliothèque</h1>
 		<form action="/add_book" method="POST">

@@ -43,5 +43,5 @@ public interface ILibrary {
 	 *            The id of the book
 	 * @return The book associated with this id.
 	 */
-	Book getBookByID(final int id);
+	Book getBookByID(final long id);
 }

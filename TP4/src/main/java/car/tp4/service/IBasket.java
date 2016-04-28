@@ -14,7 +14,7 @@ public interface IBasket {
 	 * there.
 	 * @param id
 	 */
-	void addToBasket(final int id);
+	void add(final int id);
 
 	/**
 	 * Takes one from the quantity of the specified book. Removes the book from
@@ -23,12 +23,12 @@ public interface IBasket {
 	 * @param id
 	 *            The book to remove.
 	 */
-	void removeFromBasket(final int id);
+	void remove(final int id);
 
 	/**
 	 * Validates the baskets and register an order.
 	 */
-	void validateBasket();
+	void validate();
 	
 
 	/**
@@ -36,5 +36,10 @@ public interface IBasket {
 	 * 
 	 * @return
 	 */
-	Map<Book, Integer> getBasketContent();
+	Map<Book, Integer> getContent();
+	
+	/**
+	 * Empties the basket.
+	 */
+	void empty();
 }

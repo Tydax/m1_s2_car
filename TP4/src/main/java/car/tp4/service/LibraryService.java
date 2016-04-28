@@ -68,7 +68,7 @@ public class LibraryService implements ILibrary {
 	 * @see car.tp4.service.ILibrary#getBookByID(int)
 	 */
 	@Override
-	public Book getBookByID(int id) {
+	public Book getBookByID(final long id) {
 		Book book = null;
 
 		for (final Book b : this.library) {
